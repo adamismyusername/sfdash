@@ -6,6 +6,8 @@
     <title>Custom Tools Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Add SortableJS for drag and drop functionality -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <style>
         :root {
             --turquoise: #1abc9c;
@@ -507,6 +509,93 @@
             opacity: 0.7;
             cursor: not-allowed;
         }
+
+        /* Drag and drop styles */
+        .tool-card.admin-mode {
+            cursor: move; /* Show move cursor in admin mode */
+        }
+
+        .sortable-ghost {
+            opacity: 0.3;
+            background-color: var(--clouds);
+        }
+
+        .sortable-chosen {
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .sortable-drag {
+            opacity: 0.8;
+            transform: scale(1.05);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+
+        .drag-handle {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: var(--clouds);
+            border-radius: 3px;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: move;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 5;
+        }
+
+        .tool-card.admin-mode:hover .drag-handle {
+            opacity: 0.8;
+        }
+
+        .drag-handle .material-icons {
+            font-size: 16px;
+            color: var(--asbestos);
+        }
+
+        /* Save order button */
+        .save-order-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background-color: var(--emerald);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 900;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .save-order-btn:hover {
+            background-color: var(--nephritis);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .save-order-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .save-order-btn.show {
+            display: flex;
+        }
+
+        .save-order-btn.saving {
+            pointer-events: none;
+            opacity: 0.8;
+        }
     </style>
 </head>
 <body>
@@ -515,6 +604,12 @@
     <div class="dashboard" id="dashboard">
         <!-- Tool cards will be added here dynamically -->
     </div>
+
+    <!-- Save Order Button (visible in admin mode when order changes) -->
+    <button id="saveOrderBtn" class="save-order-btn">
+        <span class="material-icons">save</span>
+        Save Order
+    </button>
 
     <!-- Admin Panel (hidden by default) -->
     <div id="adminPanel" class="admin-panel" style="display: none;">
@@ -643,6 +738,12 @@
             'task', 'api', 'cable', 'query_stats', 'devices', 'app_settings_alt'
         ];
 
+        // Sortable instance
+        let sortableInstance = null;
+        
+        // Flag to track if the order has changed
+        let orderChanged = false;
+
         // Initialize tools data with defaults
         function initializeDefaultTools() {
             toolsData = [];
@@ -712,6 +813,11 @@
                     openEditPanel(tool.id);
                 });
                 
+                // Drag handle (visible in admin mode)
+                const dragHandle = document.createElement('div');
+                dragHandle.className = 'drag-handle';
+                dragHandle.innerHTML = '<span class="material-icons">drag_indicator</span>';
+                
                 info.appendChild(title);
                 info.appendChild(description);
                 content.appendChild(iconDiv);
@@ -720,6 +826,7 @@
                 card.appendChild(content);
                 card.appendChild(tooltip);
                 card.appendChild(editButton);
+                card.appendChild(dragHandle);
                 
                 dashboard.appendChild(card);
                 
@@ -742,7 +849,61 @@
                 document.querySelectorAll('.tool-card').forEach(card => {
                     card.classList.add('admin-mode');
                 });
+                
+                // Initialize drag and drop
+                initDragAndDrop();
+            } else {
+                // Destroy sortable if it exists
+                if (sortableInstance) {
+                    sortableInstance.destroy();
+                    sortableInstance = null;
+                }
             }
+        }
+
+        // Initialize drag and drop functionality
+        function initDragAndDrop() {
+            if (sortableInstance) {
+                sortableInstance.destroy();
+            }
+            
+            const dashboard = document.getElementById('dashboard');
+            
+            sortableInstance = new Sortable(dashboard, {
+                animation: 150,
+                ghostClass: 'sortable-ghost',
+                chosenClass: 'sortable-chosen',
+                dragClass: 'sortable-drag',
+                handle: '.drag-handle',
+                onEnd: function(evt) {
+                    // Update the toolsData array to match the new order
+                    updateToolsDataOrder();
+                    
+                    // Show the save button
+                    orderChanged = true;
+                    document.getElementById('saveOrderBtn').classList.add('show');
+                }
+            });
+        }
+
+        // Update the toolsData array to match the current DOM order
+        function updateToolsDataOrder() {
+            const dashboard = document.getElementById('dashboard');
+            const cards = dashboard.querySelectorAll('.tool-card');
+            
+            // Create a new array to hold the reordered tools
+            const newToolsData = [];
+            
+            cards.forEach(card => {
+                const toolId = parseInt(card.getAttribute('data-tool-id'));
+                const tool = toolsData.find(t => t.id === toolId);
+                if (tool) {
+                    newToolsData.push(tool);
+                }
+            });
+            
+            // Replace the old array with the new one
+            toolsData = newToolsData;
         }
 
         // GitHub API functions
@@ -841,6 +1002,11 @@
                 }
 
                 showStatusMessage('Configuration saved to GitHub successfully', 'success');
+                
+                // Reset the order changed flag when saving is successful
+                orderChanged = false;
+                document.getElementById('saveOrderBtn').classList.remove('show');
+                
                 return true;
             } catch (error) {
                 console.error('Error saving config to GitHub:', error);
@@ -1003,6 +1169,9 @@
             document.getElementById('adminToggle').textContent = '✓';
             document.getElementById('adminToggle').style.backgroundColor = 'var(--emerald)';
             document.getElementById('adminToggle').style.color = 'white';
+            
+            // Initialize drag and drop
+            initDragAndDrop();
         }
         
         // Exit admin mode
@@ -1016,6 +1185,20 @@
             document.getElementById('adminToggle').textContent = '⚙️';
             document.getElementById('adminToggle').style.backgroundColor = 'white';
             document.getElementById('adminToggle').style.color = 'initial';
+            
+            // Hide save order button
+            document.getElementById('saveOrderBtn').classList.remove('show');
+            
+            // Destroy sortable if it exists
+            if (sortableInstance) {
+                sortableInstance.destroy();
+                sortableInstance = null;
+            }
+            
+            // If order has changed but not saved, save it now
+            if (orderChanged) {
+                saveConfigToGitHub();
+            }
         }
         
         // Open edit panel for a specific tool
@@ -1095,6 +1278,18 @@
                     document.getElementById('adminPanel').style.display = 'none';
                 }
             }
+        });
+
+        // Save order button click handler
+        document.getElementById('saveOrderBtn').addEventListener('click', async function() {
+            const button = document.getElementById('saveOrderBtn');
+            button.classList.add('saving');
+            button.innerHTML = '<span class="loading-spinner"></span>Saving...';
+            
+            await saveConfigToGitHub();
+            
+            button.classList.remove('saving');
+            button.innerHTML = '<span class="material-icons">save</span>Save Order';
         });
         
         // Test GitHub connection button
@@ -1223,31 +1418,44 @@
         
         // Initialize the dashboard
         window.addEventListener('DOMContentLoaded', async function() {
-            loadSettings();
+            // Use predefined GitHub settings for this specific project
+            githubSettings = {
+                username: 'adamismyusername',
+                repo: 'sfdash',
+                token: '', // Token will be entered by admin
+                branch: 'main'
+            };
             
-            // First try to load config from GitHub (this works for both admin and non-admin)
-            if (githubSettings.username && githubSettings.repo) {
-                let config;
-                
-                // Try using the API with token if in admin mode
-                if (githubSettings.token) {
-                    config = await fetchConfigFromGitHub();
+            // Populate GitHub settings form with predefined values
+            document.getElementById('githubUsername').value = githubSettings.username;
+            document.getElementById('githubRepo').value = githubSettings.repo;
+            document.getElementById('githubBranch').value = githubSettings.branch;
+            
+            // Try to load stored token from localStorage
+            try {
+                const token = localStorage.getItem('githubToken');
+                if (token) {
+                    githubSettings.token = token;
+                    document.getElementById('githubToken').value = token;
                 }
-                
-                // If that failed or no token available, try public access
-                if (!config) {
-                    config = await loadPublicConfigFromGitHub();
-                }
-                
-                // If we got config, update the tools data
-                if (config && config.toolsData) {
-                    toolsData = config.toolsData;
-                    // Save to localStorage as backup
-                    try {
-                        localStorage.setItem('dashboardTools', JSON.stringify(toolsData));
-                    } catch (e) {
-                        console.warn('Could not save to localStorage');
-                    }
+            } catch (e) {
+                console.warn('localStorage not available');
+            }
+            
+            // Initialize with default tools in case we can't load from GitHub
+            initializeDefaultTools();
+            
+            // Try to load config from GitHub (even for non-admin)
+            let config = await loadPublicConfigFromGitHub();
+            
+            // If we got config, update the tools data
+            if (config && config.toolsData) {
+                toolsData = config.toolsData;
+                // Save to localStorage as backup
+                try {
+                    localStorage.setItem('dashboardTools', JSON.stringify(toolsData));
+                } catch (e) {
+                    console.warn('Could not save to localStorage');
                 }
             }
             
