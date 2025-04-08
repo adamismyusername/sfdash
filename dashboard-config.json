@@ -17,20 +17,20 @@
       "color": "var(--turquoise)"
     },
     {
-      "id": 3,
-      "icon": "build",
-      "title": "Drag/Drop Test",
-      "description": "This is a test of drag and drop",
-      "url": "#",
-      "color": "var(--peter-river)"
-    },
-    {
       "id": 4,
       "icon": "code",
       "title": "Testing Fixed Drag/Drop",
       "description": "Let's see if the drag/drop saving is fixed. ",
       "url": "#",
       "color": "var(--amethyst)"
+    },
+    {
+      "id": 3,
+      "icon": "build",
+      "title": "Drag/Drop Test",
+      "description": "This is a test of drag and drop",
+      "url": "#",
+      "color": "var(--peter-river)"
     },
     {
       "id": 5,
