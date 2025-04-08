@@ -27,8 +27,8 @@
     {
       "id": 4,
       "icon": "code",
-      "title": "Tool 4",
-      "description": "This is a description for Tool 4. It explains what this tool does and how to use it.",
+      "title": "Testing Fixed Drag/Drop",
+      "description": "Let's see if the drag/drop saving is fixed. ",
       "url": "#",
       "color": "var(--amethyst)"
     },
