@@ -51,8 +51,8 @@
     {
       "id": 7,
       "icon": "pie_chart",
-      "title": "Tool 7",
-      "description": "This is a description for Tool 7. It explains what this tool does and how to use it.",
+      "title": "Console Test",
+      "description": "Testing console logging",
       "url": "#",
       "color": "var(--nephritis)"
     },
