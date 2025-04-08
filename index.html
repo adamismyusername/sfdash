@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Marketing Deparment Tools</title>
+    <title>Custom Tools Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
@@ -55,11 +55,12 @@
 
         .dashboard {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            grid-template-columns: repeat(4, 1fr);
             gap: 16px;
             width: 100%;
-            max-width: 1920px;
+            max-width: 1440px;
             margin: 0 auto;
+            padding: 0 24px;
         }
 
         .tool-card {
@@ -133,13 +134,19 @@
             line-height: 1.4;
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 1200px) {
             .dashboard {
-                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                grid-template-columns: repeat(3, 1fr);
             }
         }
 
-        @media (max-width: 480px) {
+        @media (max-width: 900px) {
+            .dashboard {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
             .dashboard {
                 grid-template-columns: 1fr;
             }
@@ -207,14 +214,261 @@
     </style>
 </head>
 <body>
-    <h1>Marketing Deparment Tools</h1>
+    <h1>Your Custom Tools Dashboard</h1>
     
     <div class="dashboard" id="dashboard">
         <!-- Tool cards will be added here dynamically -->
     </div>
 
+    <!-- Admin Panel (hidden by default) -->
+    <div id="adminPanel" class="admin-panel" style="display: none;">
+        <div class="admin-header">
+            <h2>Admin Panel</h2>
+            <button id="closeAdmin" class="admin-close-btn">×</button>
+        </div>
+        <div class="admin-content">
+            <h3>Edit Tool</h3>
+            <div class="admin-form">
+                <div class="form-group">
+                    <label for="toolIcon">Icon:</label>
+                    <input type="text" id="toolIcon" placeholder="Icon name">
+                    <div class="icon-preview">
+                        <span class="material-icons">dashboard</span>
+                        <small>Preview</small>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="toolTitle">Title:</label>
+                    <input type="text" id="toolTitle" placeholder="Tool Title">
+                </div>
+                <div class="form-group">
+                    <label for="toolDescription">Description:</label>
+                    <textarea id="toolDescription" placeholder="Tool description"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="toolLink">Link URL:</label>
+                    <input type="text" id="toolLink" placeholder="https://example.com/tool">
+                </div>
+                <div class="form-actions">
+                    <button id="saveToolChanges" class="admin-save-btn">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="adminLoginPanel" class="admin-login-panel" style="display: none;">
+        <div class="admin-login-content">
+            <h3>Admin Login</h3>
+            <div class="admin-form">
+                <div class="form-group">
+                    <label for="adminPassword">Password:</label>
+                    <input type="password" id="adminPassword">
+                </div>
+                <div class="form-actions">
+                    <button id="loginAdmin" class="admin-login-btn">Login</button>
+                    <button id="cancelLogin" class="admin-cancel-btn">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="adminToggle" class="admin-toggle" title="Admin Mode">⚙️</div>
+
+    <style>
+        /* Admin panel styles */
+        .admin-panel {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            width: 400px;
+            max-width: 90vw;
+        }
+        
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .admin-close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--asbestos);
+        }
+        
+        .admin-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .form-group label {
+            font-weight: 500;
+            font-size: 14px;
+            color: var(--wet-asphalt);
+        }
+        
+        .form-group input, .form-group textarea {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        
+        .icon-preview {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 5px;
+            padding: 8px;
+            background-color: #f5f7fa;
+            border-radius: 6px;
+        }
+        
+        .icon-preview .material-icons {
+            font-size: 24px;
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 10px;
+        }
+        
+        .admin-save-btn {
+            background-color: var(--peter-river);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+        
+        .admin-save-btn:hover {
+            background-color: var(--belize-hole);
+        }
+        
+        .admin-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 900;
+            font-size: 20px;
+            transition: transform 0.3s;
+        }
+        
+        .admin-toggle:hover {
+            transform: scale(1.1);
+        }
+        
+        .admin-login-panel {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            width: 300px;
+            max-width: 90vw;
+        }
+        
+        .admin-login-btn, .admin-cancel-btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.2s;
+            border: none;
+        }
+        
+        .admin-login-btn {
+            background-color: var(--peter-river);
+            color: white;
+        }
+        
+        .admin-cancel-btn {
+            background-color: #eee;
+            color: var(--asbestos);
+            margin-left: 10px;
+        }
+        
+        .admin-login-btn:hover {
+            background-color: var(--belize-hole);
+        }
+        
+        .admin-cancel-btn:hover {
+            background-color: #ddd;
+        }
+        
+        /* When in admin mode, add edit buttons to cards */
+        .tool-card.admin-mode {
+            position: relative;
+        }
+        
+        .edit-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 5;
+        }
+        
+        .tool-card.admin-mode:hover .edit-button {
+            opacity: 1;
+        }
+    </style>
+
     <script>
-        // Define tool data
+        // Tool data - for each tool we store icon, title, description, url, and color
+        let toolsData = [];
+        
+        // Define tool colors
         const toolColors = [
             'var(--turquoise)', 'var(--emerald)', 'var(--peter-river)', 'var(--amethyst)', 'var(--wet-asphalt)', 'var(--green-sea)',
             'var(--nephritis)', 'var(--belize-hole)', 'var(--wisteria)', 'var(--midnight-blue)', 'var(--sunflower)', 'var(--carrot)',
@@ -231,68 +485,231 @@
             'task', 'api', 'cable', 'query_stats', 'devices', 'app_settings_alt'
         ];
 
-        // Create all 36 tool cards
-        const dashboard = document.getElementById('dashboard');
-        
+        // Initialize tools data
         for (let i = 0; i < 36; i++) {
             const colorIndex = i % toolColors.length;
             const iconIndex = i % toolIcons.length;
             
-            const card = document.createElement('div');
-            card.className = 'tool-card';
-            card.setAttribute('data-tool', `tool-${i+1}`);
-            
-            const colorBand = document.createElement('div');
-            colorBand.className = 'card-color-band';
-            colorBand.style.backgroundColor = toolColors[colorIndex];
-            
-            const content = document.createElement('div');
-            content.className = 'tool-content';
-            
-            const iconDiv = document.createElement('div');
-            iconDiv.className = 'tool-icon';
-            iconDiv.style.backgroundColor = toolColors[colorIndex];
-            
-            const icon = document.createElement('span');
-            icon.className = 'material-icons';
-            icon.textContent = toolIcons[iconIndex];
-            iconDiv.appendChild(icon);
-            
-            const info = document.createElement('div');
-            info.className = 'tool-info';
-            
-            const title = document.createElement('h3');
-            title.className = 'tool-title';
-            title.textContent = `Tool ${i+1}`;
-            
-            const description = document.createElement('p');
-            description.className = 'tool-description';
-            description.textContent = `This is a description for Tool ${i+1}. It explains what this tool does and how to use it.`;
-            
-            const tooltip = document.createElement('div');
-            tooltip.className = 'tooltip';
-            tooltip.textContent = `Click to open Tool ${i+1}`;
-            
-            info.appendChild(title);
-            info.appendChild(description);
-            content.appendChild(iconDiv);
-            content.appendChild(info);
-            card.appendChild(colorBand);
-            card.appendChild(content);
-            card.appendChild(tooltip);
-            
-            dashboard.appendChild(card);
-            
-            // Add click event
-            card.addEventListener('click', function() {
-                this.classList.add('pulse');
-                console.log(`Tool ${i+1} clicked`);
-                // In a real implementation, this would open the tool
-                setTimeout(() => {
-                    this.classList.remove('pulse');
-                }, 1500);
+            toolsData.push({
+                id: i + 1,
+                icon: toolIcons[iconIndex],
+                title: `Tool ${i+1}`,
+                description: `This is a description for Tool ${i+1}. It explains what this tool does and how to use it.`,
+                url: '#',
+                color: toolColors[colorIndex]
             });
         }
+
+        // Create all tool cards
+        function renderDashboard() {
+            const dashboard = document.getElementById('dashboard');
+            dashboard.innerHTML = ''; // Clear existing cards
+            
+            toolsData.forEach((tool) => {
+                const card = document.createElement('div');
+                card.className = 'tool-card';
+                card.setAttribute('data-tool-id', tool.id);
+                
+                const colorBand = document.createElement('div');
+                colorBand.className = 'card-color-band';
+                colorBand.style.backgroundColor = tool.color;
+                
+                const content = document.createElement('div');
+                content.className = 'tool-content';
+                
+                const iconDiv = document.createElement('div');
+                iconDiv.className = 'tool-icon';
+                iconDiv.style.backgroundColor = tool.color;
+                
+                const icon = document.createElement('span');
+                icon.className = 'material-icons';
+                icon.textContent = tool.icon;
+                iconDiv.appendChild(icon);
+                
+                const info = document.createElement('div');
+                info.className = 'tool-info';
+                
+                const title = document.createElement('h3');
+                title.className = 'tool-title';
+                title.textContent = tool.title;
+                
+                const description = document.createElement('p');
+                description.className = 'tool-description';
+                description.textContent = tool.description;
+                
+                const tooltip = document.createElement('div');
+                tooltip.className = 'tooltip';
+                tooltip.textContent = `Click to open ${tool.title}`;
+                
+                // Edit button (hidden by default)
+                const editButton = document.createElement('div');
+                editButton.className = 'edit-button';
+                editButton.innerHTML = '<span class="material-icons" style="font-size: 16px;">edit</span>';
+                editButton.addEventListener('click', function(e) {
+                    e.stopPropagation(); // Prevent the card click event
+                    openEditPanel(tool.id);
+                });
+                
+                info.appendChild(title);
+                info.appendChild(description);
+                content.appendChild(iconDiv);
+                content.appendChild(info);
+                card.appendChild(colorBand);
+                card.appendChild(content);
+                card.appendChild(tooltip);
+                card.appendChild(editButton);
+                
+                dashboard.appendChild(card);
+                
+                // Add click event to open the tool URL
+                card.addEventListener('click', function() {
+                    if (!document.body.classList.contains('admin-mode')) {
+                        this.classList.add('pulse');
+                        if (tool.url && tool.url !== '#') {
+                            window.open(tool.url, '_blank');
+                        }
+                        setTimeout(() => {
+                            this.classList.remove('pulse');
+                        }, 1500);
+                    }
+                });
+            });
+        }
+
+        // Admin mode functionality
+        let isAdminMode = false;
+        const adminPassword = "admin123"; // Simple demo password - in production use a more secure approach
+        
+        // Toggle admin login panel
+        document.getElementById('adminToggle').addEventListener('click', function() {
+            if (isAdminMode) {
+                exitAdminMode();
+            } else {
+                document.getElementById('adminLoginPanel').style.display = 'block';
+            }
+        });
+        
+        // Close admin login panel
+        document.getElementById('cancelLogin').addEventListener('click', function() {
+            document.getElementById('adminLoginPanel').style.display = 'none';
+        });
+        
+        // Attempt login
+        document.getElementById('loginAdmin').addEventListener('click', function() {
+            const password = document.getElementById('adminPassword').value;
+            if (password === adminPassword) {
+                document.getElementById('adminLoginPanel').style.display = 'none';
+                enterAdminMode();
+                document.getElementById('adminPassword').value = '';
+            } else {
+                alert('Incorrect password');
+            }
+        });
+        
+        // Enter admin mode
+        function enterAdminMode() {
+            isAdminMode = true;
+            document.body.classList.add('admin-mode');
+            document.querySelectorAll('.tool-card').forEach(card => {
+                card.classList.add('admin-mode');
+            });
+            document.getElementById('adminToggle').textContent = '✓';
+            document.getElementById('adminToggle').style.backgroundColor = 'var(--emerald)';
+            document.getElementById('adminToggle').style.color = 'white';
+        }
+        
+        // Exit admin mode
+        function exitAdminMode() {
+            isAdminMode = false;
+            document.body.classList.remove('admin-mode');
+            document.querySelectorAll('.tool-card').forEach(card => {
+                card.classList.remove('admin-mode');
+            });
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('adminToggle').textContent = '⚙️';
+            document.getElementById('adminToggle').style.backgroundColor = 'white';
+            document.getElementById('adminToggle').style.color = 'initial';
+        }
+        
+        // Open edit panel for a specific tool
+        let currentToolId = null;
+        function openEditPanel(toolId) {
+            currentToolId = toolId;
+            const tool = toolsData.find(t => t.id === toolId);
+            
+            // Populate form fields
+            document.getElementById('toolIcon').value = tool.icon;
+            document.getElementById('toolTitle').value = tool.title;
+            document.getElementById('toolDescription').value = tool.description;
+            document.getElementById('toolLink').value = tool.url;
+            
+            // Update icon preview
+            document.querySelector('.icon-preview .material-icons').textContent = tool.icon;
+            
+            // Show the panel
+            document.getElementById('adminPanel').style.display = 'block';
+        }
+        
+        // Close admin panel
+        document.getElementById('closeAdmin').addEventListener('click', function() {
+            document.getElementById('adminPanel').style.display = 'none';
+        });
+        
+        // Preview icon as user types
+        document.getElementById('toolIcon').addEventListener('input', function() {
+            document.querySelector('.icon-preview .material-icons').textContent = this.value;
+        });
+        
+        // Save tool changes
+        document.getElementById('saveToolChanges').addEventListener('click', function() {
+            if (currentToolId) {
+                const toolIndex = toolsData.findIndex(t => t.id === currentToolId);
+                if (toolIndex !== -1) {
+                    // Update tool data
+                    toolsData[toolIndex].icon = document.getElementById('toolIcon').value;
+                    toolsData[toolIndex].title = document.getElementById('toolTitle').value;
+                    toolsData[toolIndex].description = document.getElementById('toolDescription').value;
+                    toolsData[toolIndex].url = document.getElementById('toolLink').value;
+                    
+                    // Re-render the dashboard
+                    renderDashboard();
+                    
+            // Save to localStorage for persistence
+                    try {
+                        localStorage.setItem('dashboardTools', JSON.stringify(toolsData));
+                    } catch (e) {
+                        console.warn('localStorage not available (likely due to sandbox restrictions)');
+                        // Changes will still be visible but won't persist after page refresh in sandboxed environments
+                    }
+                    
+                    // Close the panel
+                    document.getElementById('adminPanel').style.display = 'none';
+                }
+            }
+        });
+        
+        // Load tools data from localStorage if available
+        function loadToolsData() {
+            try {
+                const savedTools = localStorage.getItem('dashboardTools');
+                if (savedTools) {
+                    try {
+                        toolsData = JSON.parse(savedTools);
+                    } catch (e) {
+                        console.error('Error parsing saved tools data:', e);
+                    }
+                }
+            } catch (e) {
+                console.warn('localStorage not available (likely due to sandbox restrictions)');
+                // Continue with default data in sandboxed environments
+            }
+        }
+        
+        // Initialize the dashboard
+        window.addEventListener('DOMContentLoaded', function() {
+            loadToolsData();
+            renderDashboard();
+        });
 
         // Function to automatically resize for iframe
         function resizeForIframe() {
