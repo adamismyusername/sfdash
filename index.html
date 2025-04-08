@@ -1,4 +1,142 @@
-<!DOCTYPE html>
+// Open edit panel for a specific tool
+        function openEditPanel(toolId) {
+            currentToolId = toolId;
+            const tool = toolsData.find(t => t.id === toolId);
+            
+            // Populate form fields
+            document.getElementById('toolIcon').value = tool.icon;
+            document.getElementById('toolTitle').value = tool.title;
+            document.getElementById('toolDescription').value = tool.description;
+            document.getElementById('toolLink').value = tool.url;
+            
+            // Set visibility radio buttons
+            if (tool.hidden) {
+                document.getElementById('toolHiddenOption').checked = true;
+            } else {
+                document.getElementById('toolVisibleOption').checked = true;
+            }
+            
+            // Update icon preview
+            document.querySelector('.icon-preview .material-icons').textContent = tool.icon;
+            
+            // Show the panel
+            document.getElementById('adminPanel').style.display = 'block';
+            
+            // Build and set up the color picker
+            setupColorPicker(tool.color);
+        }
+        
+        // Set up the color picker
+        function setupColorPicker(selectedColor) {
+            const colorPicker = document.getElementById('colorPicker');
+            colorPicker.innerHTML = ''; // Clear existing swatches
+            
+            // Create an object to store color names and values for easy lookup
+            const colorMap = {
+                'turquoise': 'var(--turquoise)',
+                'emerald': 'var(--emerald)',
+                'peter-river': 'var(--peter-river)',
+                'amethyst': 'var(--amethyst)',
+                'wet-asphalt': 'var(--wet-asphalt)',
+                'green-sea': 'var(--green-sea)',
+                'nephritis': 'var(--nephritis)',
+                'belize-hole': 'var(--belize-hole)',
+                'wisteria': 'var(--wisteria)',
+                'midnight-blue': 'var(--midnight-blue)',
+                'sunflower': 'var(--sunflower)',
+                'carrot': 'var(--carrot)',
+                'alizarin': 'var(--alizarin)',
+                'clouds': 'var(--clouds)',
+                'concrete': 'var(--concrete)',
+                'orange': 'var(--orange)',
+                'pumpkin': 'var(--pumpkin)',
+                'pomegranate': 'var(--pomegranate)',
+                'silver': 'var(--silver)',
+                'asbestos': 'var(--asbestos)'
+            };
+            
+            // Create a color swatch for each color
+            Object.entries(colorMap).forEach(([name, value]) => {
+                const swatch = document.createElement('div');
+                swatch.className = 'color-swatch';
+                swatch.setAttribute('data-color-value', value);
+                swatch.style.backgroundColor = value;
+                
+                // Add the color name tooltip
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'color-swatch-name';
+                nameSpan.textContent = name.replace(/-/g, ' ');
+                swatch.appendChild(nameSpan);
+                
+                // Mark as selected if this is the current color
+                if (value === selectedColor) {
+                    swatch.classList.add('selected');
+                }
+                
+                // Add click event
+                swatch.addEventListener('click', function() {
+                    // Remove selected class from all swatches
+                    document.querySelectorAll('.color-swatch').forEach(s => {
+                        s.classList.remove('selected');
+                    });
+                    
+                    // Add selected class to this swatch
+                    this.classList.add('selected');
+                });
+                
+                colorPicker.appendChild(swatch);
+            });
+        }
+        
+        // Save tool changes
+        document.getElementById('saveToolChanges').addEventListener('click', async function() {
+            if (currentToolId) {
+                const toolIndex = toolsData.findIndex(t => t.id === currentToolId);
+                if (toolIndex !== -1) {
+                    // Get the selected color
+                    const selectedSwatch = document.querySelector('.color-swatch.selected');
+                    const selectedColor = selectedSwatch ? selectedSwatch.getAttribute('data-color-value') : toolsData[toolIndex].color;
+                    
+                    // Get the visibility status
+                    const isHidden = document.getElementById('toolHiddenOption').checked;
+                    
+                    // Update tool data
+                    toolsData[toolIndex].icon = document.getElementById('toolIcon').value;
+                    toolsData[toolIndex].title = document.getElementById('toolTitle').value;
+                    toolsData[toolIndex].description = document.getElementById('toolDescription').value;
+                    toolsData[toolIndex].url = document.getElementById('toolLink').value;
+                    toolsData[toolIndex].color = selectedColor;
+                    toolsData[toolIndex].hidden = isHidden;
+                    
+                    // Re-render the dashboard
+                    renderDashboard();
+                    
+                    // If GitHub is configured, save to GitHub
+                    if (githubSettings.username && githubSettings.repo && githubSettings.token) {
+                        const button = document.getElementById('saveToolChanges');
+                        const originalText = button.textContent;
+                        button.innerHTML = '<span class="loading-spinner"></span>Saving...';
+                        button.disabled = true;
+
+                        await saveConfigToGitHub();
+
+                        button.textContent = originalText;
+                        button.disabled = false;
+                    } else {
+                        // Save to localStorage for persistence
+                        try {
+                            localStorage.setItem('dashboardTools', JSON.stringify(toolsData));
+                        } catch (e) {
+                            console.warn('localStorage not available (likely due to sandbox restrictions)');
+                            // Changes will still be visible but won't persist after page refresh in sandboxed environments
+                        }
+                    }
+                    
+                    // Close the panel
+                    document.getElementById('adminPanel').style.display = 'none';
+                }
+            }
+        });<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -545,29 +683,100 @@
             pointer-events: none;
         }
         
-        .color-swatch:hover .color-swatch-name {
-            opacity: 1;
-            visibility: visible;
+        /* Visibility options in edit panel */
+        .visibility-options {
+            display: flex;
+            gap: 20px;
+            margin-top: 8px;
+        }
+        
+        .radio-container {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+        
+        .radio-label {
+            font-size: 14px;
+            color: var(--wet-asphalt);
         }
 
-        /* Drag and drop styles */
-        .tool-card.admin-mode {
-            cursor: move; /* Show move cursor in admin mode */
+        /* Dashboard controls styles */
+        .dashboard-controls {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin: 0 auto 20px;
+            width: 100%;
+            max-width: 1440px;
+            padding: 0 24px;
         }
-
-        .sortable-ghost {
-            opacity: 0.3;
-            background-color: var(--clouds);
+        
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-
-        .sortable-chosen {
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        
+        .toggle-label {
+            font-size: 14px;
+            color: var(--wet-asphalt);
+            font-weight: 500;
         }
-
-        .sortable-drag {
-            opacity: 0.8;
-            transform: scale(1.05);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--concrete);
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .toggle-slider {
+            background-color: var(--emerald);
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+        }
+        
+        /* Empty dashboard message */
+        .empty-dashboard-message {
+            text-align: center;
+            padding: 40px;
+            color: var(--asbestos);
+            font-size: 16px;
+            grid-column: 1 / -1;
         }
 
         .drag-handle {
@@ -591,9 +800,43 @@
             opacity: 0.8;
         }
 
-        .drag-handle .material-icons {
-            font-size: 16px;
-            color: var(--asbestos);
+        /* Visibility toggle button */
+        .visibility-button {
+            position: absolute;
+            top: 10px;
+            right: 45px;
+            background-color: white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 5;
+        }
+        
+        .tool-card.admin-mode:hover .visibility-button {
+            opacity: 1;
+        }
+        
+        .hidden-tool {
+            opacity: 0.6;
+        }
+        
+        .hidden-tool::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.5);
+            border-radius: 12px;
+            z-index: 2;
         }
 
         /* Save order button */
@@ -641,6 +884,16 @@
 <body>
     <h1>Your Custom Tools Dashboard</h1>
     
+    <div class="dashboard-controls">
+        <div class="toggle-container">
+            <label class="toggle-switch">
+                <input type="checkbox" id="showHiddenTools">
+                <span class="toggle-slider"></span>
+            </label>
+            <span class="toggle-label">Show Hidden Tools</span>
+        </div>
+    </div>
+    
     <div class="dashboard" id="dashboard">
         <!-- Tool cards will be added here dynamically -->
     </div>
@@ -680,10 +933,17 @@
                     <label for="toolLink">Link URL:</label>
                     <input type="text" id="toolLink" placeholder="https://example.com/tool">
                 </div>
-                <div class="form-group">
-                    <label for="toolColor">Color:</label>
-                    <div class="color-picker" id="colorPicker">
-                        <!-- Color swatches will be added here dynamically -->
+        <div class="form-group">
+                    <label for="toolVisibility">Visibility:</label>
+                    <div class="visibility-options">
+                        <label class="radio-container">
+                            <input type="radio" name="toolVisibility" value="visible" id="toolVisibleOption">
+                            <span class="radio-label">Visible</span>
+                        </label>
+                        <label class="radio-container">
+                            <input type="radio" name="toolVisibility" value="hidden" id="toolHiddenOption">
+                            <span class="radio-label">Hidden</span>
+                        </label>
                     </div>
                 </div>
                 <div class="form-actions">
@@ -790,7 +1050,7 @@
         // Flag to track if the order has changed
         let orderChanged = false;
 
-        // Initialize tools data with defaults
+        // Add the hidden property to the tool data structure if not present
         function initializeDefaultTools() {
             toolsData = [];
             
@@ -804,7 +1064,8 @@
                     title: `Tool ${i+1}`,
                     description: `This is a description for Tool ${i+1}. It explains what this tool does and how to use it.`,
                     url: '#',
-                    color: toolColors[colorIndex]
+                    color: toolColors[colorIndex],
+                    hidden: false  // Add hidden property, default to not hidden
                 });
             }
         }
@@ -814,10 +1075,31 @@
             const dashboard = document.getElementById('dashboard');
             dashboard.innerHTML = ''; // Clear existing cards
             
-            toolsData.forEach((tool) => {
+            // Check if we should show hidden tools
+            const showHiddenTools = document.getElementById('showHiddenTools').checked;
+            
+            // Filter tools based on visibility setting
+            const toolsToShow = showHiddenTools 
+                ? toolsData 
+                : toolsData.filter(tool => !tool.hidden);
+            
+            // Show message if no tools to display
+            if (toolsToShow.length === 0) {
+                const emptyMessage = document.createElement('div');
+                emptyMessage.className = 'empty-dashboard-message';
+                emptyMessage.textContent = 'No visible tools available. Toggle "Show Hidden Tools" to see all tools or customize tools in admin mode.';
+                dashboard.appendChild(emptyMessage);
+                return;
+            }
+            
+            toolsToShow.forEach((tool) => {
                 const card = document.createElement('div');
                 card.className = 'tool-card';
                 card.setAttribute('data-tool-id', tool.id);
+                
+                if (tool.hidden) {
+                    card.classList.add('hidden-tool');
+                }
                 
                 const colorBand = document.createElement('div');
                 colorBand.className = 'card-color-band';
@@ -859,6 +1141,17 @@
                     openEditPanel(tool.id);
                 });
                 
+                // Visibility toggle button (visible in admin mode)
+                const visibilityButton = document.createElement('div');
+                visibilityButton.className = 'visibility-button';
+                visibilityButton.innerHTML = tool.hidden ? 
+                    '<span class="material-icons" style="font-size: 16px;">visibility_off</span>' : 
+                    '<span class="material-icons" style="font-size: 16px;">visibility</span>';
+                visibilityButton.addEventListener('click', function(e) {
+                    e.stopPropagation(); // Prevent the card click event
+                    toggleToolVisibility(tool.id);
+                });
+                
                 // Drag handle (visible in admin mode)
                 const dragHandle = document.createElement('div');
                 dragHandle.className = 'drag-handle';
@@ -872,6 +1165,7 @@
                 card.appendChild(content);
                 card.appendChild(tooltip);
                 card.appendChild(editButton);
+                card.appendChild(visibilityButton);
                 card.appendChild(dragHandle);
                 
                 dashboard.appendChild(card);
@@ -899,6 +1193,11 @@
                 // Initialize drag and drop
                 initDragAndDrop();
             } else {
+                // Hide visibility buttons when not in admin mode
+                document.querySelectorAll('.visibility-button').forEach(button => {
+                    button.style.display = 'none';
+                });
+                
                 // Destroy sortable if it exists
                 if (sortableInstance) {
                     sortableInstance.destroy();
@@ -906,6 +1205,47 @@
                 }
             }
         }
+        
+        // Toggle tool visibility
+        function toggleToolVisibility(toolId) {
+            const toolIndex = toolsData.findIndex(t => t.id === toolId);
+            if (toolIndex !== -1) {
+                // Toggle the hidden property
+                toolsData[toolIndex].hidden = !toolsData[toolIndex].hidden;
+                
+                // Re-render the dashboard
+                renderDashboard();
+                
+                // Save changes if GitHub is configured
+                if (githubSettings.username && githubSettings.repo && githubSettings.token) {
+                    saveConfigToGitHub();
+                } else {
+                    // Save to localStorage for persistence
+                    try {
+                        localStorage.setItem('dashboardTools', JSON.stringify(toolsData));
+                    } catch (e) {
+                        console.warn('localStorage not available');
+                    }
+                }
+                
+                // Show feedback message
+                const status = toolsData[toolIndex].hidden ? 'hidden' : 'visible';
+                showStatusMessage(`Tool "${toolsData[toolIndex].title}" is now ${status}`, 'success');
+            }
+        }
+
+        // Toggle show/hide hidden tools
+        document.getElementById('showHiddenTools').addEventListener('change', function() {
+            // Save the preference in localStorage
+            try {
+                localStorage.setItem('showHiddenTools', this.checked);
+            } catch (e) {
+                console.warn('localStorage not available');
+            }
+            
+            // Re-render the dashboard
+            renderDashboard();
+        });
 
         // Initialize drag and drop functionality
         function initDragAndDrop() {
@@ -1595,8 +1935,14 @@
                     githubSettings.token = token;
                     document.getElementById('githubToken').value = token;
                 }
+                
+                // Load show hidden tools preference
+                const showHiddenTools = localStorage.getItem('showHiddenTools');
+                document.getElementById('showHiddenTools').checked = showHiddenTools === 'true';
             } catch (e) {
                 console.warn('localStorage not available');
+                // Default to not showing hidden tools
+                document.getElementById('showHiddenTools').checked = false;
             }
             
             // Initialize with default tools in case we can't load from GitHub
@@ -1618,6 +1964,14 @@
             // If we got config, update the tools data
             if (config && config.toolsData) {
                 toolsData = config.toolsData;
+                
+                // Ensure all tools have the hidden property
+                toolsData.forEach(tool => {
+                    if (tool.hidden === undefined) {
+                        tool.hidden = false;
+                    }
+                });
+                
                 // Save to localStorage as backup
                 try {
                     localStorage.setItem('dashboardTools', JSON.stringify(toolsData));
