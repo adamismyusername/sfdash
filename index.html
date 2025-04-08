@@ -1128,7 +1128,7 @@
                 const token = localStorage.getItem('githubToken');
                 const branch = localStorage.getItem('githubBranch') || 'main';
                 
-                if (username && repo && token) {
+                if (username && repo) {
                     githubSettings = {
                         username,
                         repo,
@@ -1139,28 +1139,85 @@
                     // Populate GitHub settings form
                     document.getElementById('githubUsername').value = username;
                     document.getElementById('githubRepo').value = repo;
-                    document.getElementById('githubToken').value = token;
+                    document.getElementById('githubToken').value = token || '';
                     document.getElementById('githubBranch').value = branch;
+                } else {
+                    // Try to infer GitHub settings from URL
+                    tryInferGitHubSettings();
                 }
                 
-                // Try to load tools data from localStorage if GitHub not configured
-                if (!githubSettings.username || !githubSettings.repo || !githubSettings.token) {
-                    const savedTools = localStorage.getItem('dashboardTools');
-                    if (savedTools) {
-                        try {
-                            toolsData = JSON.parse(savedTools);
-                        } catch (e) {
-                            console.error('Error parsing saved tools data:', e);
-                            initializeDefaultTools();
-                        }
-                    } else {
+                // Try to load tools data from localStorage as fallback
+                const savedTools = localStorage.getItem('dashboardTools');
+                if (savedTools) {
+                    try {
+                        toolsData = JSON.parse(savedTools);
+                    } catch (e) {
+                        console.error('Error parsing saved tools data:', e);
                         initializeDefaultTools();
                     }
+                } else {
+                    initializeDefaultTools();
                 }
             } catch (e) {
                 console.warn('localStorage not available (likely due to sandbox restrictions)');
+                // Try to infer GitHub settings from URL
+                tryInferGitHubSettings();
                 // Continue with default data in sandboxed environments
                 initializeDefaultTools();
+            }
+        }
+        
+        // Try to infer GitHub settings from the current URL
+        function tryInferGitHubSettings() {
+            try {
+                const url = new URL(window.location.href);
+                const pathParts = url.pathname.split('/').filter(part => part);
+                
+                // Check if we're on GitHub Pages
+                if (url.hostname.endsWith('github.io')) {
+                    const username = url.hostname.replace('.github.io', '');
+                    const repo = pathParts[0] || '';
+                    
+                    if (username && repo) {
+                        githubSettings.username = username;
+                        githubSettings.repo = repo;
+                        githubSettings.token = ''; // No token for public reading
+                        githubSettings.branch = 'main';
+                        
+                        console.log('Inferred GitHub settings from URL:', githubSettings);
+                    }
+                }
+            } catch (e) {
+                console.warn('Error inferring GitHub settings from URL:', e);
+            }
+        }
+        
+        // Load config from GitHub for non-admin users (public read)
+        async function loadPublicConfigFromGitHub() {
+            if (!githubSettings.username || !githubSettings.repo) {
+                return null;
+            }
+            
+            try {
+                // For public repositories, we can read without a token
+                const url = `https://raw.githubusercontent.com/${githubSettings.username}/${githubSettings.repo}/${githubSettings.branch}/dashboard-config.json`;
+                
+                const response = await fetch(url);
+                
+                if (response.status === 404) {
+                    console.log('Configuration file not found on GitHub');
+                    return null;
+                }
+                
+                if (!response.ok) {
+                    throw new Error(`GitHub request error: ${response.status}`);
+                }
+                
+                const config = await response.json();
+                return config;
+            } catch (error) {
+                console.error('Error loading public config from GitHub:', error);
+                return null;
             }
         }
         
@@ -1168,12 +1225,34 @@
         window.addEventListener('DOMContentLoaded', async function() {
             loadSettings();
             
-            // If GitHub is configured, try to load config from GitHub
-            if (githubSettings.username && githubSettings.repo && githubSettings.token) {
-                await loadConfigFromGitHub();
-            } else {
-                renderDashboard();
+            // First try to load config from GitHub (this works for both admin and non-admin)
+            if (githubSettings.username && githubSettings.repo) {
+                let config;
+                
+                // Try using the API with token if in admin mode
+                if (githubSettings.token) {
+                    config = await fetchConfigFromGitHub();
+                }
+                
+                // If that failed or no token available, try public access
+                if (!config) {
+                    config = await loadPublicConfigFromGitHub();
+                }
+                
+                // If we got config, update the tools data
+                if (config && config.toolsData) {
+                    toolsData = config.toolsData;
+                    // Save to localStorage as backup
+                    try {
+                        localStorage.setItem('dashboardTools', JSON.stringify(toolsData));
+                    } catch (e) {
+                        console.warn('Could not save to localStorage');
+                    }
+                }
             }
+            
+            // Render the dashboard with whatever data we have
+            renderDashboard();
         });
 
         // Function to automatically resize for iframe
