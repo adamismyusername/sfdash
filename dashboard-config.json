@@ -19,8 +19,8 @@
     {
       "id": 3,
       "icon": "build",
-      "title": "Tool 3",
-      "description": "This is a description for Tool 3. It explains what this tool does and how to use it.",
+      "title": "Drag/Drop Test",
+      "description": "This is a test of drag and drop",
       "url": "#",
       "color": "var(--peter-river)"
     },
