@@ -483,31 +483,71 @@
             visibility: visible;
         }
 
-        /* Loading Spinner */
-        .loading-spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
-            margin-right: 8px;
+        /* Color picker styles */
+        .color-picker {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin-top: 8px;
         }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        
+        .color-swatch {
+            width: 100%;
+            height: 36px;
+            border-radius: 6px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
         }
-
-        .action-button {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
+        
+        .color-swatch:hover {
+            transform: scale(1.05);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
         }
-
-        .action-button:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
+        
+        .color-swatch.selected {
+            border-color: var(--wet-asphalt);
+            box-shadow: 0 0 0 2px white, 0 0 0 4px var(--wet-asphalt);
+        }
+        
+        .color-swatch::after {
+            content: "✓";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-weight: bold;
+            opacity: 0;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+        
+        .color-swatch.selected::after {
+            opacity: 1;
+        }
+        
+        .color-swatch-name {
+            position: absolute;
+            bottom: -24px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            white-space: nowrap;
+            background-color: var(--wet-asphalt);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 3px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s;
+            pointer-events: none;
+        }
+        
+        .color-swatch:hover .color-swatch-name {
+            opacity: 1;
+            visibility: visible;
         }
 
         /* Drag and drop styles */
@@ -639,6 +679,12 @@
                 <div class="form-group">
                     <label for="toolLink">Link URL:</label>
                     <input type="text" id="toolLink" placeholder="https://example.com/tool">
+                </div>
+                <div class="form-group">
+                    <label for="toolColor">Color:</label>
+                    <div class="color-picker" id="colorPicker">
+                        <!-- Color swatches will be added here dynamically -->
+                    </div>
                 </div>
                 <div class="form-actions">
                     <button id="saveToolChanges" class="admin-save-btn action-button">Save Changes</button>
@@ -1264,38 +1310,88 @@
             
             // Show the panel
             document.getElementById('adminPanel').style.display = 'block';
+            
+            // Build and set up the color picker
+            setupColorPicker(tool.color);
         }
         
-        // Close admin panel
-        document.getElementById('closeAdmin').addEventListener('click', function() {
-            document.getElementById('adminPanel').style.display = 'none';
-        });
-        
-        // Close GitHub panel
-        document.getElementById('closeGithubPanel').addEventListener('click', function() {
-            document.getElementById('githubTokenPanel').style.display = 'none';
+        // Set up the color picker
+        function setupColorPicker(selectedColor) {
+            const colorPicker = document.getElementById('colorPicker');
+            colorPicker.innerHTML = ''; // Clear existing swatches
             
-            // If GitHub settings are configured, enter admin mode
-            if (githubSettings.username && githubSettings.repo && githubSettings.token) {
-                enterAdminMode();
-            }
-        });
-        
-        // Preview icon as user types
-        document.getElementById('toolIcon').addEventListener('input', function() {
-            document.querySelector('.icon-preview .material-icons').textContent = this.value;
-        });
+            // Create an object to store color names and values for easy lookup
+            const colorMap = {
+                'turquoise': 'var(--turquoise)',
+                'emerald': 'var(--emerald)',
+                'peter-river': 'var(--peter-river)',
+                'amethyst': 'var(--amethyst)',
+                'wet-asphalt': 'var(--wet-asphalt)',
+                'green-sea': 'var(--green-sea)',
+                'nephritis': 'var(--nephritis)',
+                'belize-hole': 'var(--belize-hole)',
+                'wisteria': 'var(--wisteria)',
+                'midnight-blue': 'var(--midnight-blue)',
+                'sunflower': 'var(--sunflower)',
+                'carrot': 'var(--carrot)',
+                'alizarin': 'var(--alizarin)',
+                'clouds': 'var(--clouds)',
+                'concrete': 'var(--concrete)',
+                'orange': 'var(--orange)',
+                'pumpkin': 'var(--pumpkin)',
+                'pomegranate': 'var(--pomegranate)',
+                'silver': 'var(--silver)',
+                'asbestos': 'var(--asbestos)'
+            };
+            
+            // Create a color swatch for each color
+            Object.entries(colorMap).forEach(([name, value]) => {
+                const swatch = document.createElement('div');
+                swatch.className = 'color-swatch';
+                swatch.setAttribute('data-color-value', value);
+                swatch.style.backgroundColor = value;
+                
+                // Add the color name tooltip
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'color-swatch-name';
+                nameSpan.textContent = name.replace(/-/g, ' ');
+                swatch.appendChild(nameSpan);
+                
+                // Mark as selected if this is the current color
+                if (value === selectedColor) {
+                    swatch.classList.add('selected');
+                }
+                
+                // Add click event
+                swatch.addEventListener('click', function() {
+                    // Remove selected class from all swatches
+                    document.querySelectorAll('.color-swatch').forEach(s => {
+                        s.classList.remove('selected');
+                    });
+                    
+                    // Add selected class to this swatch
+                    this.classList.add('selected');
+                });
+                
+                colorPicker.appendChild(swatch);
+            });
+        }
         
         // Save tool changes
         document.getElementById('saveToolChanges').addEventListener('click', async function() {
             if (currentToolId) {
                 const toolIndex = toolsData.findIndex(t => t.id === currentToolId);
                 if (toolIndex !== -1) {
+                    // Get the selected color
+                    const selectedSwatch = document.querySelector('.color-swatch.selected');
+                    const selectedColor = selectedSwatch ? selectedSwatch.getAttribute('data-color-value') : toolsData[toolIndex].color;
+                    
                     // Update tool data
                     toolsData[toolIndex].icon = document.getElementById('toolIcon').value;
                     toolsData[toolIndex].title = document.getElementById('toolTitle').value;
                     toolsData[toolIndex].description = document.getElementById('toolDescription').value;
                     toolsData[toolIndex].url = document.getElementById('toolLink').value;
+                    toolsData[toolIndex].color = selectedColor;
                     
                     // Re-render the dashboard
                     renderDashboard();
