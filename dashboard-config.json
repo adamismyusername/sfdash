@@ -51,10 +51,10 @@
     {
       "id": 8,
       "icon": "bar_chart",
-      "title": "Tool 8",
-      "description": "This is a description for Tool 8. It explains what this tool does and how to use it.",
+      "title": "Color Test",
+      "description": "Testing the color selection",
       "url": "#",
-      "color": "var(--belize-hole)"
+      "color": "var(--wisteria)"
     },
     {
       "id": 9,
