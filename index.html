@@ -949,8 +949,15 @@
         }
 
         async function saveConfigToGitHub() {
+            console.log("Saving config to GitHub with settings:", githubSettings);
+            
             if (!githubSettings.username || !githubSettings.repo || !githubSettings.token) {
                 showStatusMessage('GitHub settings not configured', 'error');
+                console.error("GitHub settings missing:", {
+                    username: !!githubSettings.username, 
+                    repo: !!githubSettings.repo, 
+                    token: !!githubSettings.token
+                });
                 return false;
             }
 
@@ -960,6 +967,7 @@
             try {
                 // Check if the file already exists to get its SHA
                 const checkUrl = `https://api.github.com/repos/${githubSettings.username}/${githubSettings.repo}/contents/dashboard-config.json?ref=${githubSettings.branch}`;
+                console.log("Checking for existing file at:", checkUrl);
                 
                 const checkResponse = await fetch(checkUrl, {
                     headers: {
@@ -972,10 +980,14 @@
                 if (checkResponse.ok) {
                     const fileData = await checkResponse.json();
                     sha = fileData.sha;
+                    console.log("File exists, got SHA:", sha);
+                } else {
+                    console.log("File doesn't exist or couldn't be accessed, status:", checkResponse.status);
                 }
 
                 // Now update or create the file
                 const url = `https://api.github.com/repos/${githubSettings.username}/${githubSettings.repo}/contents/dashboard-config.json`;
+                console.log("Saving to URL:", url);
                 
                 const payload = {
                     message: 'Update dashboard configuration',
@@ -987,6 +999,8 @@
                     payload.sha = sha;
                 }
 
+                console.log("Sending payload with content length:", encodedContent.length);
+                
                 const response = await fetch(url, {
                     method: 'PUT',
                     headers: {
@@ -998,9 +1012,14 @@
                 });
 
                 if (!response.ok) {
+                    const errorData = await response.json();
+                    console.error("GitHub API error response:", errorData);
                     throw new Error(`GitHub API error: ${response.status}`);
                 }
 
+                const responseData = await response.json();
+                console.log("Save successful:", responseData);
+                
                 showStatusMessage('Configuration saved to GitHub successfully', 'success');
                 
                 // Reset the order changed flag when saving is successful
@@ -1059,6 +1078,8 @@
         }
 
         function saveGitHubSettings() {
+            console.log("Saving GitHub settings");
+            
             const username = document.getElementById('githubUsername').value;
             const repo = document.getElementById('githubRepo').value;
             const token = document.getElementById('githubToken').value;
@@ -1066,6 +1087,11 @@
 
             if (!username || !repo || !token) {
                 showStatusMessage('Please fill in all GitHub settings', 'error');
+                console.error("Missing GitHub settings:", {
+                    username: !!username,
+                    repo: !!repo,
+                    token: !!token
+                });
                 return;
             }
 
@@ -1076,6 +1102,13 @@
                 token,
                 branch
             };
+            
+            console.log("GitHub settings updated:", {
+                username: githubSettings.username,
+                repo: githubSettings.repo,
+                hasToken: !!githubSettings.token,
+                branch: githubSettings.branch
+            });
 
             // Store in localStorage (but never store the token in plain text in production)
             try {
@@ -1083,14 +1116,28 @@
                 localStorage.setItem('githubRepo', repo);
                 localStorage.setItem('githubToken', token); // In production, use encryption here
                 localStorage.setItem('githubBranch', branch);
+                console.log("GitHub settings saved to localStorage");
                 
                 showStatusMessage('GitHub settings saved successfully', 'success');
                 document.getElementById('githubTokenPanel').style.display = 'none';
                 
                 // Try to load config from GitHub
                 loadConfigFromGitHub();
+                
+                // Enter admin mode
+                enterAdminMode();
             } catch (e) {
-                console.warn('localStorage not available (likely due to sandbox restrictions)');
+                console.warn('localStorage not available (likely due to sandbox restrictions):', e);
+                
+                // Still set the settings for this session
+                showStatusMessage('GitHub settings saved for this session', 'success');
+                document.getElementById('githubTokenPanel').style.display = 'none';
+                
+                // Try to load config from GitHub
+                loadConfigFromGitHub();
+                
+                // Enter admin mode
+                enterAdminMode();
             }
         }
 
@@ -1302,6 +1349,20 @@
             saveGitHubSettings();
         });
         
+        // Add key press event for admin password field
+        document.getElementById('adminPassword').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('loginAdmin').click();
+            }
+        });
+        
+        // Add key press event for GitHub token field
+        document.getElementById('githubToken').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('saveGithubSettings').click();
+            }
+        });
+        
         // Status message function
         function showStatusMessage(message, type) {
             const statusElement = document.getElementById('statusMessage');
@@ -1446,7 +1507,17 @@
             initializeDefaultTools();
             
             // Try to load config from GitHub (even for non-admin)
-            let config = await loadPublicConfigFromGitHub();
+            let config = null;
+            
+            // Try using the API with token if token is available
+            if (githubSettings.token) {
+                config = await fetchConfigFromGitHub();
+            }
+            
+            // If that failed or no token available, try public access
+            if (!config) {
+                config = await loadPublicConfigFromGitHub();
+            }
             
             // If we got config, update the tools data
             if (config && config.toolsData) {
