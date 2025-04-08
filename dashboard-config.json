@@ -49,14 +49,6 @@
       "color": "var(--green-sea)"
     },
     {
-      "id": 7,
-      "icon": "pie_chart",
-      "title": "Console Test",
-      "description": "Testing console logging",
-      "url": "#",
-      "color": "var(--nephritis)"
-    },
-    {
       "id": 8,
       "icon": "bar_chart",
       "title": "Tool 8",
@@ -79,6 +71,14 @@
       "description": "This is a description for Tool 10. It explains what this tool does and how to use it.",
       "url": "#",
       "color": "var(--midnight-blue)"
+    },
+    {
+      "id": 7,
+      "icon": "pie_chart",
+      "title": "Console Test",
+      "description": "Testing console logging",
+      "url": "#",
+      "color": "var(--nephritis)"
     },
     {
       "id": 11,
