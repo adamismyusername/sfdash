@@ -17,14 +17,6 @@
       "color": "var(--turquoise)"
     },
     {
-      "id": 4,
-      "icon": "code",
-      "title": "Testing Fixed Drag/Drop",
-      "description": "Let's see if the drag/drop saving is fixed. ",
-      "url": "#",
-      "color": "var(--amethyst)"
-    },
-    {
       "id": 5,
       "icon": "info",
       "title": "Tool 5",
