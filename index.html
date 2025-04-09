@@ -1,20 +1,223 @@
-// Open edit panel for a specific tool
+// Start with empty toolsData
+            toolsData = [];
+            
+            // Try to load config from GitHub (even for non-admin)
+            let config = null;
+            
+            // Try using the API with token if token is available
+            if (githubSettings.token) {
+                config = await fetchConfigFromGitHub();
+            }
+            
+            // If that failed or no token available, try public access
+            if (!config) {
+                config = await loadPublicConfigFromGitHub();
+            }
+            
+            // If we got config, update the tools data
+            if (config && config.toolsData) {
+                toolsData = config.toolsData;
+                // Save to localStorage as backup
+                try {
+                    localStorage.setItem('dashboardTools', JSON.stringify(toolsData));
+                } catch (e) {
+                    console.warn('Could not save to localStorage');
+                }
+            }
+            
+            // Render the dashboard with whatever data we have
+            renderDashboard();
+        });
+
+        // Function to automatically resize for iframe
+        function resizeForIframe() {
+            if (window.self !== window.top) {
+                // We're in an iframe
+                const height = document.body.scrollHeight;
+                window.parent.postMessage({ type: 'resize', height }, '*');
+            }
+        }
+
+        // Listen for window resize and content changes
+        window.addEventListener('resize', resizeForIframe);
+        window.addEventListener('load', resizeForIframe);
+        
+        // Check for iframe resize periodically
+        setInterval(resizeForIframe, 500);
+    </script>
+</body>
+</html>                const iconDiv = document.createElement('div');
+                iconDiv.className = 'tool-icon';
+                iconDiv.style.backgroundColor = tool.color;
+                
+                const icon = document.createElement('span');
+                icon.className = 'material-icons';
+                icon.textContent = tool.icon;
+                iconDiv.appendChild(icon);
+                
+                const info = document.createElement('div');
+                info.className = 'tool-info';
+                
+                const title = document.createElement('h3');
+                title.className = 'tool-title';
+                title.textContent = tool.title;
+                
+                const description = document.createElement('p');
+                description.className = 'tool-description';
+                description.textContent = tool.description;
+                
+                const tooltip = document.createElement('div');
+                tooltip.className = 'tooltip';
+                tooltip.textContent = `Click to open ${tool.title}`;
+                
+                // Edit button (hidden by default)
+                const editButton = document.createElement('div');
+                editButton.className = 'edit-button';
+                editButton.innerHTML = '<span class="material-icons" style="font-size: 16px;">edit</span>';
+                editButton.addEventListener('click', function(e) {
+                    e.stopPropagation(); // Prevent the card click event
+                    openEditPanel(tool.id);
+                });
+                
+                // Drag handle (visible in admin mode)
+                const dragHandle = document.createElement('div');
+                dragHandle.className = 'drag-handle';
+                dragHandle.innerHTML = '<span class="material-icons">drag_indicator</span>';
+                
+                info.appendChild(title);
+                info.appendChild(description);
+                content.appendChild(iconDiv);
+                content.appendChild(info);
+                card.appendChild(colorBand);
+                card.appendChild(content);
+                card.appendChild(tooltip);
+                card.appendChild(editButton);
+                card.appendChild(dragHandle);
+                
+                dashboard.appendChild(card);
+                
+                // Add click event to open the tool URL
+                card.addEventListener('click', function() {
+                    if (!document.body.classList.contains('admin-mode')) {
+                        this.classList.add('pulse');
+                        if (tool.url && tool.url !== '#') {
+                            window.open(tool.url, '_blank');
+                        }
+                        setTimeout(() => {
+                            this.classList.remove('pulse');
+                        }, 1500);
+                    }
+                });
+            });
+
+            // In admin mode, add the "Add Tool" button
+            if (document.body.classList.contains('admin-mode')) {
+                const addButton = document.createElement('div');
+                addButton.className = 'add-tool-button';
+                
+                const addIcon = document.createElement('span');
+                addIcon.className = 'material-icons';
+                addIcon.textContent = 'add_circle';
+                
+                const addText = document.createElement('span');
+                addText.className = 'add-tool-button-text';
+                addText.textContent = 'Add New Tool';
+                
+                addButton.appendChild(addIcon);
+                addButton.appendChild(addText);
+                
+                addButton.addEventListener('click', function() {
+                    openAddPanel();
+                });
+                
+                dashboard.appendChild(addButton);
+            }
+
+            // Update admin mode if active
+            if (document.body.classList.contains('admin-mode')) {
+                document.querySelectorAll('.tool-card').forEach(card => {
+                    card.classList.add('admin-mode');
+                });
+                
+                // Initialize drag and drop
+                initDragAndDrop();
+            } else {
+                // Destroy sortable if it exists
+                if (sortableInstance) {
+                    sortableInstance.destroy();
+                    sortableInstance = null;
+                }
+            }
+        }
+
+        // Initialize drag and drop functionality
+        function initDragAndDrop() {
+            if (sortableInstance) {
+                sortableInstance.destroy();
+            }
+            
+            const dashboard = document.getElementById('dashboard');
+            
+            sortableInstance = new Sortable(dashboard, {
+                animation: 150,
+                ghostClass: 'sortable-ghost',
+                chosenClass: 'sortable-chosen',
+                dragClass: 'sortable-drag',
+                handle: '.drag-handle',
+                filter: '.add-tool-button', // Don't allow the add button to be sorted
+                onEnd: function(evt) {
+                    // Don't do anything if we're dragging the add button
+                    if (evt.item.classList.contains('add-tool-button')) {
+                        return;
+                    }
+                    
+                    // Update the toolsData array to match the new order
+                    updateToolsDataOrder();
+                    
+                    // Show the save button
+                    orderChanged = true;
+                    document.getElementById('saveOrderBtn').classList.add('show');
+                }
+            });
+        }
+
+        // Update the toolsData array to match the current DOM order
+        function updateToolsDataOrder() {
+            const dashboard = document.getElementById('dashboard');
+            const cards = dashboard.querySelectorAll('.tool-card');
+            
+            // Create a new array to hold the reordered tools
+            const newToolsData = [];
+            
+            cards.forEach(card => {
+                const toolId = parseInt(card.getAttribute('data-tool-id'));
+                const tool = toolsData.find(t => t.id === toolId);
+                if (tool) {
+                    newToolsData.push(tool);
+                }
+            });
+            
+            // Replace the old array with the new one
+            toolsData = newToolsData;
+        }
+
+        // Open edit panel for existing tool
         function openEditPanel(toolId) {
+            isAddingNewTool = false;
             currentToolId = toolId;
             const tool = toolsData.find(t => t.id === toolId);
+            
+            // Update panel title
+            document.getElementById('adminPanelTitle').textContent = 'Edit Tool';
+            
+            // Show delete button
+            document.getElementById('deleteToolBtn').style.display = 'block';
             
             // Populate form fields
             document.getElementById('toolIcon').value = tool.icon;
             document.getElementById('toolTitle').value = tool.title;
             document.getElementById('toolDescription').value = tool.description;
             document.getElementById('toolLink').value = tool.url;
-            
-            // Set visibility radio buttons
-            if (tool.hidden) {
-                document.getElementById('toolHiddenOption').checked = true;
-            } else {
-                document.getElementById('toolVisibleOption').checked = true;
-            }
             
             // Update icon preview
             document.querySelector('.icon-preview .material-icons').textContent = tool.icon;
@@ -24,6 +227,68 @@
             
             // Build and set up the color picker
             setupColorPicker(tool.color);
+        }
+        
+        // Open panel for adding a new tool
+        function openAddPanel() {
+            isAddingNewTool = true;
+            currentToolId = null;
+            
+            // Update panel title
+            document.getElementById('adminPanelTitle').textContent = 'Add New Tool';
+            
+            // Hide delete button
+            document.getElementById('deleteToolBtn').style.display = 'none';
+            
+            // Reset form fields
+            document.getElementById('toolIcon').value = 'dashboard';
+            document.getElementById('toolTitle').value = '';
+            document.getElementById('toolDescription').value = '';
+            document.getElementById('toolLink').value = '#';
+            
+            // Update icon preview
+            document.querySelector('.icon-preview .material-icons').textContent = 'dashboard';
+            
+            // Show the panel
+            document.getElementById('adminPanel').style.display = 'block';
+            
+            // Default color is the first one
+            setupColorPicker(toolColors[0]);
+        }
+        
+        // Delete the current tool
+        function deleteTool() {
+            if (currentToolId) {
+                // Find the index of the tool to delete
+                const toolIndex = toolsData.findIndex(t => t.id === currentToolId);
+                if (toolIndex !== -1) {
+                    // Confirm deletion
+                    if (confirm(`Are you sure you want to delete "${toolsData[toolIndex].title}"?`)) {
+                        // Remove the tool from the array
+                        toolsData.splice(toolIndex, 1);
+                        
+                        // Re-render the dashboard
+                        renderDashboard();
+                        
+                        // Save changes
+                        if (githubSettings.username && githubSettings.repo && githubSettings.token) {
+                            saveConfigToGitHub();
+                        } else {
+                            try {
+                                localStorage.setItem('dashboardTools', JSON.stringify(toolsData));
+                            } catch (e) {
+                                console.warn('localStorage not available');
+                            }
+                        }
+                        
+                        // Close the panel
+                        document.getElementById('adminPanel').style.display = 'none';
+                        
+                        // Show success message
+                        showStatusMessage('Tool deleted successfully', 'success');
+                    }
+                }
+            }
         }
         
         // Set up the color picker
@@ -88,55 +353,569 @@
             });
         }
         
-        // Save tool changes
+        // Generate a unique ID for a new tool
+        function generateToolId() {
+            if (toolsData.length === 0) {
+                return 1; // Start with ID 1 if no tools
+            }
+            
+            // Find the highest existing ID and add 1
+            const highestId = Math.max(...toolsData.map(tool => tool.id));
+            return highestId + 1;
+        }
+        
+        // Save tool changes or add new tool
         document.getElementById('saveToolChanges').addEventListener('click', async function() {
-            if (currentToolId) {
+            // Get the selected color
+            const selectedSwatch = document.querySelector('.color-swatch.selected');
+            const selectedColor = selectedSwatch ? selectedSwatch.getAttribute('data-color-value') : toolColors[0];
+            
+            if (isAddingNewTool) {
+                // Create a new tool object
+                const newTool = {
+                    id: generateToolId(),
+                    icon: document.getElementById('toolIcon').value || 'dashboard',
+                    title: document.getElementById('toolTitle').value || 'New Tool',
+                    description: document.getElementById('toolDescription').value || 'Tool description',
+                    url: document.getElementById('toolLink').value || '#',
+                    color: selectedColor
+                };
+                
+                // Add to tools array
+                toolsData.push(newTool);
+                
+                // Show success message
+                showStatusMessage('New tool added successfully', 'success');
+            } else if (currentToolId) {
+                // Edit existing tool
                 const toolIndex = toolsData.findIndex(t => t.id === currentToolId);
                 if (toolIndex !== -1) {
-                    // Get the selected color
-                    const selectedSwatch = document.querySelector('.color-swatch.selected');
-                    const selectedColor = selectedSwatch ? selectedSwatch.getAttribute('data-color-value') : toolsData[toolIndex].color;
-                    
-                    // Get the visibility status
-                    const isHidden = document.getElementById('toolHiddenOption').checked;
-                    
                     // Update tool data
                     toolsData[toolIndex].icon = document.getElementById('toolIcon').value;
                     toolsData[toolIndex].title = document.getElementById('toolTitle').value;
                     toolsData[toolIndex].description = document.getElementById('toolDescription').value;
                     toolsData[toolIndex].url = document.getElementById('toolLink').value;
                     toolsData[toolIndex].color = selectedColor;
-                    toolsData[toolIndex].hidden = isHidden;
                     
-                    // Re-render the dashboard
-                    renderDashboard();
-                    
-                    // If GitHub is configured, save to GitHub
-                    if (githubSettings.username && githubSettings.repo && githubSettings.token) {
-                        const button = document.getElementById('saveToolChanges');
-                        const originalText = button.textContent;
-                        button.innerHTML = '<span class="loading-spinner"></span>Saving...';
-                        button.disabled = true;
-
-                        await saveConfigToGitHub();
-
-                        button.textContent = originalText;
-                        button.disabled = false;
-                    } else {
-                        // Save to localStorage for persistence
-                        try {
-                            localStorage.setItem('dashboardTools', JSON.stringify(toolsData));
-                        } catch (e) {
-                            console.warn('localStorage not available (likely due to sandbox restrictions)');
-                            // Changes will still be visible but won't persist after page refresh in sandboxed environments
-                        }
-                    }
-                    
-                    // Close the panel
-                    document.getElementById('adminPanel').style.display = 'none';
+                    // Show success message
+                    showStatusMessage('Tool updated successfully', 'success');
                 }
             }
-        });<!DOCTYPE html>
+            
+            // Re-render the dashboard
+            renderDashboard();
+            
+            // Save changes
+            if (githubSettings.username && githubSettings.repo && githubSettings.token) {
+                const button = document.getElementById('saveToolChanges');
+                const originalText = button.textContent;
+                button.innerHTML = '<span class="loading-spinner"></span>Saving...';
+                button.disabled = true;
+
+                await saveConfigToGitHub();
+
+                button.textContent = originalText;
+                button.disabled = false;
+            } else {
+                // Save to localStorage for persistence
+                try {
+                    localStorage.setItem('dashboardTools', JSON.stringify(toolsData));
+                } catch (e) {
+                    console.warn('localStorage not available (likely due to sandbox restrictions)');
+                }
+            }
+            
+            // Close the panel
+            document.getElementById('adminPanel').style.display = 'none';
+        });
+        
+        // Delete tool button click handler
+        document.getElementById('deleteToolBtn').addEventListener('click', function() {
+            deleteTool();
+        });
+
+        // GitHub API functions
+        async function fetchConfigFromGitHub() {
+            console.log("Fetching config from GitHub with settings:", githubSettings);
+            
+            if (!githubSettings.username || !githubSettings.repo || !githubSettings.token) {
+                showStatusMessage('GitHub settings not configured', 'error');
+                console.error("GitHub settings missing:", {
+                    username: !!githubSettings.username, 
+                    repo: !!githubSettings.repo, 
+                    token: !!githubSettings.token
+                });
+                return null;
+            }
+
+            try {
+                // First, check if the file exists
+                const url = `https://api.github.com/repos/${githubSettings.username}/${githubSettings.repo}/contents/dashboard-config.json?ref=${githubSettings.branch}`;
+                console.log("Checking for file at:", url);
+                
+                const response = await fetch(url, {
+                    headers: {
+                        'Authorization': `token ${githubSettings.token}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+
+                if (response.status === 404) {
+                    // File doesn't exist yet, return null
+                    console.log("File doesn't exist yet");
+                    return null;
+                }
+
+                if (!response.ok) {
+                    throw new Error(`GitHub API error: ${response.status}`);
+                }
+
+                const data = await response.json();
+                const content = atob(data.content); // Decode base64
+                const config = JSON.parse(content);
+                console.log("Fetched config:", config);
+                
+                return {
+                    toolsData: config.toolsData,
+                    sha: data.sha // We need this for updating later
+                };
+            } catch (error) {
+                console.error('Error fetching config from GitHub:', error);
+                showStatusMessage('Failed to fetch configuration from GitHub', 'error');
+                return null;
+            }
+        }
+
+        async function saveConfigToGitHub() {
+            console.log("Saving config to GitHub with settings:", githubSettings);
+            
+            if (!githubSettings.username || !githubSettings.repo || !githubSettings.token) {
+                showStatusMessage('GitHub settings not configured', 'error');
+                console.error("GitHub settings missing:", {
+                    username: !!githubSettings.username, 
+                    repo: !!githubSettings.repo, 
+                    token: !!githubSettings.token
+                });
+                return false;
+            }
+
+            const configContent = JSON.stringify({ toolsData: toolsData }, null, 2);
+            const encodedContent = btoa(unescape(encodeURIComponent(configContent))); // UTF-8 safe base64 encoding
+
+            try {
+                // Check if the file already exists to get its SHA
+                const checkUrl = `https://api.github.com/repos/${githubSettings.username}/${githubSettings.repo}/contents/dashboard-config.json?ref=${githubSettings.branch}`;
+                console.log("Checking for existing file at:", checkUrl);
+                
+                const checkResponse = await fetch(checkUrl, {
+                    headers: {
+                        'Authorization': `token ${githubSettings.token}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+
+                let sha;
+                if (checkResponse.ok) {
+                    const fileData = await checkResponse.json();
+                    sha = fileData.sha;
+                    console.log("File exists, got SHA:", sha);
+                } else {
+                    console.log("File doesn't exist or couldn't be accessed, status:", checkResponse.status);
+                }
+
+                // Now update or create the file
+                const url = `https://api.github.com/repos/${githubSettings.username}/${githubSettings.repo}/contents/dashboard-config.json`;
+                console.log("Saving to URL:", url);
+                
+                const payload = {
+                    message: 'Update dashboard configuration',
+                    content: encodedContent,
+                    branch: githubSettings.branch
+                };
+
+                if (sha) {
+                    payload.sha = sha;
+                }
+
+                console.log("Sending payload with content length:", encodedContent.length);
+                
+                const response = await fetch(url, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${githubSettings.token}`,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/vnd.github.v3+json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    console.error("GitHub API error response:", errorData);
+                    throw new Error(`GitHub API error: ${response.status}`);
+                }
+
+                const responseData = await response.json();
+                console.log("Save successful:", responseData);
+                
+                showStatusMessage('Configuration saved to GitHub successfully', 'success');
+                
+                // Reset the order changed flag when saving is successful
+                orderChanged = false;
+                document.getElementById('saveOrderBtn').classList.remove('show');
+                
+                return true;
+            } catch (error) {
+                console.error('Error saving config to GitHub:', error);
+                showStatusMessage('Failed to save configuration to GitHub', 'error');
+                return false;
+            }
+        }
+
+        async function testGitHubConnection() {
+            const testUsername = document.getElementById('githubUsername').value;
+            const testRepo = document.getElementById('githubRepo').value;
+            const testToken = document.getElementById('githubToken').value;
+            const testBranch = document.getElementById('githubBranch').value || 'main';
+
+            if (!testUsername || !testRepo || !testToken) {
+                showStatusMessage('Please fill in all GitHub settings', 'error');
+                return false;
+            }
+
+            try {
+                // Just try to access the repo
+                const url = `https://api.github.com/repos/${testUsername}/${testRepo}`;
+                
+                const button = document.getElementById('testGithubConnection');
+                const originalText = button.textContent;
+                button.innerHTML = '<span class="loading-spinner"></span>Testing...';
+                button.disabled = true;
+
+                const response = await fetch(url, {
+                    headers: {
+                        'Authorization': `token ${testToken}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+
+                button.textContent = originalText;
+                button.disabled = false;
+
+                if (!response.ok) {
+                    throw new Error(`GitHub API error: ${response.status}`);
+                }
+
+                showStatusMessage('GitHub connection successful!', 'success');
+                return true;
+            } catch (error) {
+                console.error('Error testing GitHub connection:', error);
+                showStatusMessage('GitHub connection failed', 'error');
+                return false;
+            }
+        }
+
+        function saveGitHubSettings() {
+            console.log("Saving GitHub settings");
+            
+            const username = document.getElementById('githubUsername').value;
+            const repo = document.getElementById('githubRepo').value;
+            const token = document.getElementById('githubToken').value;
+            const branch = document.getElementById('githubBranch').value || 'main';
+
+            if (!username || !repo || !token) {
+                showStatusMessage('Please fill in all GitHub settings', 'error');
+                console.error("Missing GitHub settings:", {
+                    username: !!username,
+                    repo: !!repo,
+                    token: !!token
+                });
+                return;
+            }
+
+            // Save settings
+            githubSettings = {
+                username,
+                repo,
+                token,
+                branch
+            };
+            
+            console.log("GitHub settings updated:", {
+                username: githubSettings.username,
+                repo: githubSettings.repo,
+                hasToken: !!githubSettings.token,
+                branch: githubSettings.branch
+            });
+
+            // Store in localStorage (but never store the token in plain text in production)
+            try {
+                localStorage.setItem('githubUsername', username);
+                localStorage.setItem('githubRepo', repo);
+                localStorage.setItem('githubToken', token); // In production, use encryption here
+                localStorage.setItem('githubBranch', branch);
+                console.log("GitHub settings saved to localStorage");
+                
+                showStatusMessage('GitHub settings saved successfully', 'success');
+                document.getElementById('githubTokenPanel').style.display = 'none';
+                
+                // Try to load config from GitHub
+                loadConfigFromGitHub();
+                
+                // Enter admin mode
+                enterAdminMode();
+            } catch (e) {
+                console.warn('localStorage not available (likely due to sandbox restrictions):', e);
+                
+                // Still set the settings for this session
+                showStatusMessage('GitHub settings saved for this session', 'success');
+                document.getElementById('githubTokenPanel').style.display = 'none';
+                
+                // Try to load config from GitHub
+                loadConfigFromGitHub();
+                
+                // Enter admin mode
+                enterAdminMode();
+            }
+        }
+
+        async function loadConfigFromGitHub() {
+            const button = document.getElementById('saveGithubSettings');
+            if (button) {
+                const originalText = button.textContent;
+                button.innerHTML = '<span class="loading-spinner"></span>Loading...';
+                button.disabled = true;
+
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.disabled = false;
+                }, 3000);
+            }
+
+            const config = await fetchConfigFromGitHub();
+            
+            if (config && config.toolsData) {
+                toolsData = config.toolsData;
+                renderDashboard();
+                showStatusMessage('Configuration loaded from GitHub', 'success');
+            } else if (config === null) {
+                // Config doesn't exist yet, save the current config
+                saveConfigToGitHub();
+            }
+        }
+
+        // Admin mode functionality
+        let isAdminMode = false;
+        const adminPassword = "admin123"; // Simple demo password - in production use a more secure approach
+        
+        // Toggle admin login panel
+        document.getElementById('adminToggle').addEventListener('click', function() {
+            if (isAdminMode) {
+                exitAdminMode();
+            } else {
+                document.getElementById('adminLoginPanel').style.display = 'block';
+            }
+        });
+        
+        // Close admin login panel
+        document.getElementById('cancelLogin').addEventListener('click', function() {
+            document.getElementById('adminLoginPanel').style.display = 'none';
+        });
+        
+        // Attempt login
+        document.getElementById('loginAdmin').addEventListener('click', function() {
+            const password = document.getElementById('adminPassword').value;
+            if (password === adminPassword) {
+                document.getElementById('adminLoginPanel').style.display = 'none';
+                
+                // Check if GitHub settings are configured
+                if (!githubSettings.username || !githubSettings.repo || !githubSettings.token) {
+                    // Show GitHub configuration panel
+                    document.getElementById('githubTokenPanel').style.display = 'block';
+                } else {
+                    // GitHub already configured, enter admin mode
+                    enterAdminMode();
+                }
+                
+                document.getElementById('adminPassword').value = '';
+            } else {
+                showStatusMessage('Incorrect password', 'error');
+            }
+        });
+        
+        // Enter admin mode
+        function enterAdminMode() {
+            isAdminMode = true;
+            document.body.classList.add('admin-mode');
+            document.querySelectorAll('.tool-card').forEach(card => {
+                card.classList.add('admin-mode');
+            });
+            document.getElementById('adminToggle').textContent = '✓';
+            document.getElementById('adminToggle').style.backgroundColor = 'var(--emerald)';
+            document.getElementById('adminToggle').style.color = 'white';
+            
+            // Initialize drag and drop
+            renderDashboard(); // Re-render to add the "Add Tool" button
+            initDragAndDrop();
+        }
+        
+        // Exit admin mode
+        function exitAdminMode() {
+            isAdminMode = false;
+            document.body.classList.remove('admin-mode');
+            document.querySelectorAll('.tool-card').forEach(card => {
+                card.classList.remove('admin-mode');
+            });
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('adminToggle').textContent = '⚙️';
+            document.getElementById('adminToggle').style.backgroundColor = 'white';
+            document.getElementById('adminToggle').style.color = 'initial';
+            
+            // Hide save order button
+            document.getElementById('saveOrderBtn').classList.remove('show');
+            
+            // Destroy sortable if it exists
+            if (sortableInstance) {
+                sortableInstance.destroy();
+                sortableInstance = null;
+            }
+            
+            // If order has changed but not saved, save it now
+            if (orderChanged) {
+                saveConfigToGitHub();
+            }
+            
+            // Re-render the dashboard to remove the "Add Tool" button
+            renderDashboard();
+        }
+        
+        // Close admin panel
+        document.getElementById('closeAdmin').addEventListener('click', function() {
+            document.getElementById('adminPanel').style.display = 'none';
+        });
+        
+        // Close GitHub panel
+        document.getElementById('closeGithubPanel').addEventListener('click', function() {
+            document.getElementById('githubTokenPanel').style.display = 'none';
+            
+            // If GitHub settings are configured, enter admin mode
+            if (githubSettings.username && githubSettings.repo && githubSettings.token) {
+                enterAdminMode();
+            }
+        });
+        
+        // Preview icon as user types
+        document.getElementById('toolIcon').addEventListener('input', function() {
+            document.querySelector('.icon-preview .material-icons').textContent = this.value;
+        });
+        
+        // Add key press event for admin password field
+        document.getElementById('adminPassword').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('loginAdmin').click();
+            }
+        });
+        
+        // Add key press event for GitHub token field
+        document.getElementById('githubToken').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('saveGithubSettings').click();
+            }
+        });
+
+        // Save order button click handler
+        document.getElementById('saveOrderBtn').addEventListener('click', async function() {
+            const button = document.getElementById('saveOrderBtn');
+            button.classList.add('saving');
+            button.innerHTML = '<span class="loading-spinner"></span>Saving...';
+            
+            await saveConfigToGitHub();
+            
+            button.classList.remove('saving');
+            button.innerHTML = '<span class="material-icons">save</span>Save Order';
+        });
+        
+        // Test GitHub connection button
+        document.getElementById('testGithubConnection').addEventListener('click', function() {
+            testGitHubConnection();
+        });
+        
+        // Save GitHub settings button
+        document.getElementById('saveGithubSettings').addEventListener('click', function() {
+            saveGitHubSettings();
+        });
+        
+        // Status message function
+        function showStatusMessage(message, type) {
+            const statusElement = document.getElementById('statusMessage');
+            statusElement.textContent = message;
+            statusElement.className = 'status-message ' + type;
+            statusElement.classList.add('show');
+            
+            setTimeout(() => {
+                statusElement.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Load config from GitHub for non-admin users (public read)
+        async function loadPublicConfigFromGitHub() {
+            if (!githubSettings.username || !githubSettings.repo) {
+                return null;
+            }
+            
+            try {
+                // For public repositories, we can read without a token
+                const url = `https://raw.githubusercontent.com/${githubSettings.username}/${githubSettings.repo}/${githubSettings.branch}/dashboard-config.json`;
+                console.log("Loading public config from URL:", url);
+                
+                const response = await fetch(url);
+                
+                if (response.status === 404) {
+                    console.log('Configuration file not found on GitHub');
+                    return null;
+                }
+                
+                if (!response.ok) {
+                    throw new Error(`GitHub request error: ${response.status}`);
+                }
+                
+                const config = await response.json();
+                console.log("Loaded public config:", config);
+                return config;
+            } catch (error) {
+                console.error('Error loading public config from GitHub:', error);
+                return null;
+            }
+        }
+        
+        // Initialize the dashboard
+        window.addEventListener('DOMContentLoaded', async function() {
+            // Use predefined GitHub settings for this specific project
+            githubSettings = {
+                username: 'adamismyusername',
+                repo: 'sfdash',
+                token: '', // Token will be entered by admin
+                branch: 'main'
+            };
+            
+            // Populate GitHub settings form with predefined values
+            document.getElementById('githubUsername').value = githubSettings.username;
+            document.getElementById('githubRepo').value = githubSettings.repo;
+            document.getElementById('githubBranch').value = githubSettings.branch;
+            
+            // Try to load stored token from localStorage
+            try {
+                const token = localStorage.getItem('githubToken');
+                if (token) {
+                    githubSettings.token = token;
+                    document.getElementById('githubToken').value = token;
+                }
+            } catch (e) {
+                console.warn('localStorage not available');
+            }
+            
+            // Start with empty toolsData
+            tool<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -430,13 +1209,11 @@
         
         .form-actions {
             display: flex;
-            justify-content: flex-end;
+            justify-content: space-between;
             margin-top: 10px;
         }
         
-        .admin-save-btn {
-            background-color: var(--peter-river);
-            color: white;
+        .admin-save-btn, .admin-delete-btn {
             border: none;
             padding: 8px 16px;
             border-radius: 6px;
@@ -445,8 +1222,22 @@
             transition: background-color 0.2s;
         }
         
+        .admin-save-btn {
+            background-color: var(--peter-river);
+            color: white;
+        }
+        
+        .admin-delete-btn {
+            background-color: var(--alizarin);
+            color: white;
+        }
+        
         .admin-save-btn:hover {
             background-color: var(--belize-hole);
+        }
+        
+        .admin-delete-btn:hover {
+            background-color: var(--pomegranate);
         }
         
         .admin-toggle {
@@ -540,6 +1331,41 @@
             opacity: 1;
         }
 
+        /* Add button styles */
+        .add-tool-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: white;
+            border-radius: 12px;
+            border: 2px dashed var(--concrete);
+            color: var(--concrete);
+            cursor: pointer;
+            height: 100%;
+            min-height: 180px;
+            transition: all 0.3s ease;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .add-tool-button .material-icons {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+        
+        .add-tool-button-text {
+            font-weight: 500;
+            font-size: 16px;
+        }
+        
+        .add-tool-button:hover {
+            border-color: var(--peter-river);
+            color: var(--peter-river);
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
         /* GitHub token panel */
         .github-token-panel {
             position: fixed;
@@ -621,6 +1447,88 @@
             visibility: visible;
         }
 
+        /* Loading Spinner */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .action-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        /* Drag and drop styles */
+        .tool-card.admin-mode {
+            cursor: move; /* Show move cursor in admin mode */
+        }
+
+        .sortable-ghost {
+            opacity: 0.3;
+            background-color: var(--clouds);
+        }
+
+        .sortable-chosen {
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .sortable-drag {
+            opacity: 0.8;
+            transform: scale(1.05);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+        
+        .drag-handle {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: var(--clouds);
+            border-radius: 3px;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: move;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 5;
+        }
+
+        .tool-card.admin-mode:hover .drag-handle {
+            opacity: 0.8;
+        }
+
+        .drag-handle .material-icons {
+            font-size: 16px;
+            color: var(--asbestos);
+        }
+        
+        /* Empty dashboard message */
+        .empty-dashboard-message {
+            text-align: center;
+            padding: 40px;
+            color: var(--asbestos);
+            font-size: 16px;
+            grid-column: 1 / -1;
+        }
+        
         /* Color picker styles */
         .color-picker {
             display: grid;
@@ -683,162 +1591,11 @@
             pointer-events: none;
         }
         
-        /* Visibility options in edit panel */
-        .visibility-options {
-            display: flex;
-            gap: 20px;
-            margin-top: 8px;
-        }
-        
-        .radio-container {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            cursor: pointer;
-        }
-        
-        .radio-label {
-            font-size: 14px;
-            color: var(--wet-asphalt);
-        }
-
-        /* Dashboard controls styles */
-        .dashboard-controls {
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            margin: 0 auto 20px;
-            width: 100%;
-            max-width: 1440px;
-            padding: 0 24px;
-        }
-        
-        .toggle-container {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .toggle-label {
-            font-size: 14px;
-            color: var(--wet-asphalt);
-            font-weight: 500;
-        }
-        
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 50px;
-            height: 24px;
-        }
-        
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-        
-        .toggle-slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: var(--concrete);
-            transition: .4s;
-            border-radius: 34px;
-        }
-        
-        .toggle-slider:before {
-            position: absolute;
-            content: "";
-            height: 18px;
-            width: 18px;
-            left: 3px;
-            bottom: 3px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-        
-        input:checked + .toggle-slider {
-            background-color: var(--emerald);
-        }
-        
-        input:checked + .toggle-slider:before {
-            transform: translateX(26px);
-        }
-        
-        /* Empty dashboard message */
-        .empty-dashboard-message {
-            text-align: center;
-            padding: 40px;
-            color: var(--asbestos);
-            font-size: 16px;
-            grid-column: 1 / -1;
-        }
-
-        .drag-handle {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background-color: var(--clouds);
-            border-radius: 3px;
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: move;
-            opacity: 0;
-            transition: opacity 0.3s;
-            z-index: 5;
-        }
-
-        .tool-card.admin-mode:hover .drag-handle {
-            opacity: 0.8;
-        }
-
-        /* Visibility toggle button */
-        .visibility-button {
-            position: absolute;
-            top: 10px;
-            right: 45px;
-            background-color: white;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            cursor: pointer;
-            opacity: 0;
-            transition: opacity 0.3s;
-            z-index: 5;
-        }
-        
-        .tool-card.admin-mode:hover .visibility-button {
+        .color-swatch:hover .color-swatch-name {
             opacity: 1;
+            visibility: visible;
         }
         
-        .hidden-tool {
-            opacity: 0.6;
-        }
-        
-        .hidden-tool::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(255, 255, 255, 0.5);
-            border-radius: 12px;
-            z-index: 2;
-        }
-
         /* Save order button */
         .save-order-btn {
             position: fixed;
@@ -879,20 +1636,19 @@
             pointer-events: none;
             opacity: 0.8;
         }
+        
+        /* Add button visibility in admin mode */
+        .add-tool-button {
+            display: none;
+        }
+        
+        .admin-mode .add-tool-button {
+            display: flex;
+        }
     </style>
 </head>
 <body>
     <h1>Your Custom Tools Dashboard</h1>
-    
-    <div class="dashboard-controls">
-        <div class="toggle-container">
-            <label class="toggle-switch">
-                <input type="checkbox" id="showHiddenTools">
-                <span class="toggle-slider"></span>
-            </label>
-            <span class="toggle-label">Show Hidden Tools</span>
-        </div>
-    </div>
     
     <div class="dashboard" id="dashboard">
         <!-- Tool cards will be added here dynamically -->
@@ -907,11 +1663,10 @@
     <!-- Admin Panel (hidden by default) -->
     <div id="adminPanel" class="admin-panel" style="display: none;">
         <div class="admin-header">
-            <h2>Admin Panel</h2>
+            <h2 id="adminPanelTitle">Edit Tool</h2>
             <button id="closeAdmin" class="admin-close-btn">×</button>
         </div>
         <div class="admin-content">
-            <h3>Edit Tool</h3>
             <div class="admin-form">
                 <div class="form-group">
                     <label for="toolIcon">Icon:</label>
@@ -933,20 +1688,14 @@
                     <label for="toolLink">Link URL:</label>
                     <input type="text" id="toolLink" placeholder="https://example.com/tool">
                 </div>
-        <div class="form-group">
-                    <label for="toolVisibility">Visibility:</label>
-                    <div class="visibility-options">
-                        <label class="radio-container">
-                            <input type="radio" name="toolVisibility" value="visible" id="toolVisibleOption">
-                            <span class="radio-label">Visible</span>
-                        </label>
-                        <label class="radio-container">
-                            <input type="radio" name="toolVisibility" value="hidden" id="toolHiddenOption">
-                            <span class="radio-label">Hidden</span>
-                        </label>
+                <div class="form-group">
+                    <label for="toolColor">Color:</label>
+                    <div class="color-picker" id="colorPicker">
+                        <!-- Color swatches will be added here dynamically -->
                     </div>
                 </div>
                 <div class="form-actions">
+                    <button id="deleteToolBtn" class="admin-delete-btn action-button">Delete Tool</button>
                     <button id="saveToolChanges" class="admin-save-btn action-button">Save Changes</button>
                 </div>
             </div>
@@ -1050,56 +1799,28 @@
         // Flag to track if the order has changed
         let orderChanged = false;
 
-        // Add the hidden property to the tool data structure if not present
-        function initializeDefaultTools() {
-            toolsData = [];
-            
-            for (let i = 0; i < 36; i++) {
-                const colorIndex = i % toolColors.length;
-                const iconIndex = i % toolIcons.length;
-                
-                toolsData.push({
-                    id: i + 1,
-                    icon: toolIcons[iconIndex],
-                    title: `Tool ${i+1}`,
-                    description: `This is a description for Tool ${i+1}. It explains what this tool does and how to use it.`,
-                    url: '#',
-                    color: toolColors[colorIndex],
-                    hidden: false  // Add hidden property, default to not hidden
-                });
-            }
-        }
+        // Current tool being edited or null for adding new
+        let currentToolId = null;
+        let isAddingNewTool = false;
 
         // Create all tool cards
         function renderDashboard() {
             const dashboard = document.getElementById('dashboard');
             dashboard.innerHTML = ''; // Clear existing cards
             
-            // Check if we should show hidden tools
-            const showHiddenTools = document.getElementById('showHiddenTools').checked;
-            
-            // Filter tools based on visibility setting
-            const toolsToShow = showHiddenTools 
-                ? toolsData 
-                : toolsData.filter(tool => !tool.hidden);
-            
             // Show message if no tools to display
-            if (toolsToShow.length === 0) {
+            if (toolsData.length === 0) {
                 const emptyMessage = document.createElement('div');
                 emptyMessage.className = 'empty-dashboard-message';
-                emptyMessage.textContent = 'No visible tools available. Toggle "Show Hidden Tools" to see all tools or customize tools in admin mode.';
+                emptyMessage.textContent = 'No tools available. Add tools in admin mode.';
                 dashboard.appendChild(emptyMessage);
-                return;
             }
             
-            toolsToShow.forEach((tool) => {
+            // Render all tool cards
+            toolsData.forEach((tool) => {
                 const card = document.createElement('div');
                 card.className = 'tool-card';
                 card.setAttribute('data-tool-id', tool.id);
-                
-                if (tool.hidden) {
-                    card.classList.add('hidden-tool');
-                }
                 
                 const colorBand = document.createElement('div');
                 colorBand.className = 'card-color-band';
@@ -1108,895 +1829,4 @@
                 const content = document.createElement('div');
                 content.className = 'tool-content';
                 
-                const iconDiv = document.createElement('div');
-                iconDiv.className = 'tool-icon';
-                iconDiv.style.backgroundColor = tool.color;
-                
-                const icon = document.createElement('span');
-                icon.className = 'material-icons';
-                icon.textContent = tool.icon;
-                iconDiv.appendChild(icon);
-                
-                const info = document.createElement('div');
-                info.className = 'tool-info';
-                
-                const title = document.createElement('h3');
-                title.className = 'tool-title';
-                title.textContent = tool.title;
-                
-                const description = document.createElement('p');
-                description.className = 'tool-description';
-                description.textContent = tool.description;
-                
-                const tooltip = document.createElement('div');
-                tooltip.className = 'tooltip';
-                tooltip.textContent = `Click to open ${tool.title}`;
-                
-                // Edit button (hidden by default)
-                const editButton = document.createElement('div');
-                editButton.className = 'edit-button';
-                editButton.innerHTML = '<span class="material-icons" style="font-size: 16px;">edit</span>';
-                editButton.addEventListener('click', function(e) {
-                    e.stopPropagation(); // Prevent the card click event
-                    openEditPanel(tool.id);
-                });
-                
-                // Visibility toggle button (visible in admin mode)
-                const visibilityButton = document.createElement('div');
-                visibilityButton.className = 'visibility-button';
-                visibilityButton.innerHTML = tool.hidden ? 
-                    '<span class="material-icons" style="font-size: 16px;">visibility_off</span>' : 
-                    '<span class="material-icons" style="font-size: 16px;">visibility</span>';
-                visibilityButton.addEventListener('click', function(e) {
-                    e.stopPropagation(); // Prevent the card click event
-                    toggleToolVisibility(tool.id);
-                });
-                
-                // Drag handle (visible in admin mode)
-                const dragHandle = document.createElement('div');
-                dragHandle.className = 'drag-handle';
-                dragHandle.innerHTML = '<span class="material-icons">drag_indicator</span>';
-                
-                info.appendChild(title);
-                info.appendChild(description);
-                content.appendChild(iconDiv);
-                content.appendChild(info);
-                card.appendChild(colorBand);
-                card.appendChild(content);
-                card.appendChild(tooltip);
-                card.appendChild(editButton);
-                card.appendChild(visibilityButton);
-                card.appendChild(dragHandle);
-                
-                dashboard.appendChild(card);
-                
-                // Add click event to open the tool URL
-                card.addEventListener('click', function() {
-                    if (!document.body.classList.contains('admin-mode')) {
-                        this.classList.add('pulse');
-                        if (tool.url && tool.url !== '#') {
-                            window.open(tool.url, '_blank');
-                        }
-                        setTimeout(() => {
-                            this.classList.remove('pulse');
-                        }, 1500);
-                    }
-                });
-            });
-
-            // Update admin mode if active
-            if (document.body.classList.contains('admin-mode')) {
-                document.querySelectorAll('.tool-card').forEach(card => {
-                    card.classList.add('admin-mode');
-                });
-                
-                // Initialize drag and drop
-                initDragAndDrop();
-            } else {
-                // Hide visibility buttons when not in admin mode
-                document.querySelectorAll('.visibility-button').forEach(button => {
-                    button.style.display = 'none';
-                });
-                
-                // Destroy sortable if it exists
-                if (sortableInstance) {
-                    sortableInstance.destroy();
-                    sortableInstance = null;
-                }
-            }
-        }
-        
-        // Toggle tool visibility
-        function toggleToolVisibility(toolId) {
-            const toolIndex = toolsData.findIndex(t => t.id === toolId);
-            if (toolIndex !== -1) {
-                // Toggle the hidden property
-                toolsData[toolIndex].hidden = !toolsData[toolIndex].hidden;
-                
-                // Re-render the dashboard
-                renderDashboard();
-                
-                // Save changes if GitHub is configured
-                if (githubSettings.username && githubSettings.repo && githubSettings.token) {
-                    saveConfigToGitHub();
-                } else {
-                    // Save to localStorage for persistence
-                    try {
-                        localStorage.setItem('dashboardTools', JSON.stringify(toolsData));
-                    } catch (e) {
-                        console.warn('localStorage not available');
-                    }
-                }
-                
-                // Show feedback message
-                const status = toolsData[toolIndex].hidden ? 'hidden' : 'visible';
-                showStatusMessage(`Tool "${toolsData[toolIndex].title}" is now ${status}`, 'success');
-            }
-        }
-
-        // Toggle show/hide hidden tools
-        document.getElementById('showHiddenTools').addEventListener('change', function() {
-            // Save the preference in localStorage
-            try {
-                localStorage.setItem('showHiddenTools', this.checked);
-            } catch (e) {
-                console.warn('localStorage not available');
-            }
-            
-            // Re-render the dashboard
-            renderDashboard();
-        });
-
-        // Initialize drag and drop functionality
-        function initDragAndDrop() {
-            if (sortableInstance) {
-                sortableInstance.destroy();
-            }
-            
-            const dashboard = document.getElementById('dashboard');
-            
-            sortableInstance = new Sortable(dashboard, {
-                animation: 150,
-                ghostClass: 'sortable-ghost',
-                chosenClass: 'sortable-chosen',
-                dragClass: 'sortable-drag',
-                handle: '.drag-handle',
-                onEnd: function(evt) {
-                    // Update the toolsData array to match the new order
-                    updateToolsDataOrder();
-                    
-                    // Show the save button
-                    orderChanged = true;
-                    document.getElementById('saveOrderBtn').classList.add('show');
-                }
-            });
-        }
-
-        // Update the toolsData array to match the current DOM order
-        function updateToolsDataOrder() {
-            const dashboard = document.getElementById('dashboard');
-            const cards = dashboard.querySelectorAll('.tool-card');
-            
-            // Create a new array to hold the reordered tools
-            const newToolsData = [];
-            
-            cards.forEach(card => {
-                const toolId = parseInt(card.getAttribute('data-tool-id'));
-                const tool = toolsData.find(t => t.id === toolId);
-                if (tool) {
-                    newToolsData.push(tool);
-                }
-            });
-            
-            // Replace the old array with the new one
-            toolsData = newToolsData;
-        }
-
-        // GitHub API functions
-        async function fetchConfigFromGitHub() {
-            if (!githubSettings.username || !githubSettings.repo || !githubSettings.token) {
-                showStatusMessage('GitHub settings not configured', 'error');
-                return null;
-            }
-
-            try {
-                // First, check if the file exists
-                const url = `https://api.github.com/repos/${githubSettings.username}/${githubSettings.repo}/contents/dashboard-config.json?ref=${githubSettings.branch}`;
-                
-                const response = await fetch(url, {
-                    headers: {
-                        'Authorization': `token ${githubSettings.token}`,
-                        'Accept': 'application/vnd.github.v3+json'
-                    }
-                });
-
-                if (response.status === 404) {
-                    // File doesn't exist yet, return null
-                    return null;
-                }
-
-                if (!response.ok) {
-                    throw new Error(`GitHub API error: ${response.status}`);
-                }
-
-                const data = await response.json();
-                const content = atob(data.content); // Decode base64
-                const config = JSON.parse(content);
-                
-                return {
-                    toolsData: config.toolsData,
-                    sha: data.sha // We need this for updating later
-                };
-            } catch (error) {
-                console.error('Error fetching config from GitHub:', error);
-                showStatusMessage('Failed to fetch configuration from GitHub', 'error');
-                return null;
-            }
-        }
-
-        async function saveConfigToGitHub() {
-            console.log("Saving config to GitHub with settings:", githubSettings);
-            
-            if (!githubSettings.username || !githubSettings.repo || !githubSettings.token) {
-                showStatusMessage('GitHub settings not configured', 'error');
-                console.error("GitHub settings missing:", {
-                    username: !!githubSettings.username, 
-                    repo: !!githubSettings.repo, 
-                    token: !!githubSettings.token
-                });
-                return false;
-            }
-
-            const configContent = JSON.stringify({ toolsData: toolsData }, null, 2);
-            const encodedContent = btoa(unescape(encodeURIComponent(configContent))); // UTF-8 safe base64 encoding
-
-            try {
-                // Check if the file already exists to get its SHA
-                const checkUrl = `https://api.github.com/repos/${githubSettings.username}/${githubSettings.repo}/contents/dashboard-config.json?ref=${githubSettings.branch}`;
-                console.log("Checking for existing file at:", checkUrl);
-                
-                const checkResponse = await fetch(checkUrl, {
-                    headers: {
-                        'Authorization': `token ${githubSettings.token}`,
-                        'Accept': 'application/vnd.github.v3+json'
-                    }
-                });
-
-                let sha;
-                if (checkResponse.ok) {
-                    const fileData = await checkResponse.json();
-                    sha = fileData.sha;
-                    console.log("File exists, got SHA:", sha);
-                } else {
-                    console.log("File doesn't exist or couldn't be accessed, status:", checkResponse.status);
-                }
-
-                // Now update or create the file
-                const url = `https://api.github.com/repos/${githubSettings.username}/${githubSettings.repo}/contents/dashboard-config.json`;
-                console.log("Saving to URL:", url);
-                
-                const payload = {
-                    message: 'Update dashboard configuration',
-                    content: encodedContent,
-                    branch: githubSettings.branch
-                };
-
-                if (sha) {
-                    payload.sha = sha;
-                }
-
-                console.log("Sending payload with content length:", encodedContent.length);
-                
-                const response = await fetch(url, {
-                    method: 'PUT',
-                    headers: {
-                        'Authorization': `token ${githubSettings.token}`,
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/vnd.github.v3+json'
-                    },
-                    body: JSON.stringify(payload)
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    console.error("GitHub API error response:", errorData);
-                    throw new Error(`GitHub API error: ${response.status}`);
-                }
-
-                const responseData = await response.json();
-                console.log("Save successful:", responseData);
-                
-                showStatusMessage('Configuration saved to GitHub successfully', 'success');
-                
-                // Reset the order changed flag when saving is successful
-                orderChanged = false;
-                document.getElementById('saveOrderBtn').classList.remove('show');
-                
-                return true;
-            } catch (error) {
-                console.error('Error saving config to GitHub:', error);
-                showStatusMessage('Failed to save configuration to GitHub', 'error');
-                return false;
-            }
-        }
-
-        async function testGitHubConnection() {
-            const testUsername = document.getElementById('githubUsername').value;
-            const testRepo = document.getElementById('githubRepo').value;
-            const testToken = document.getElementById('githubToken').value;
-            const testBranch = document.getElementById('githubBranch').value || 'main';
-
-            if (!testUsername || !testRepo || !testToken) {
-                showStatusMessage('Please fill in all GitHub settings', 'error');
-                return false;
-            }
-
-            try {
-                // Just try to access the repo
-                const url = `https://api.github.com/repos/${testUsername}/${testRepo}`;
-                
-                const button = document.getElementById('testGithubConnection');
-                const originalText = button.textContent;
-                button.innerHTML = '<span class="loading-spinner"></span>Testing...';
-                button.disabled = true;
-
-                const response = await fetch(url, {
-                    headers: {
-                        'Authorization': `token ${testToken}`,
-                        'Accept': 'application/vnd.github.v3+json'
-                    }
-                });
-
-                button.textContent = originalText;
-                button.disabled = false;
-
-                if (!response.ok) {
-                    throw new Error(`GitHub API error: ${response.status}`);
-                }
-
-                showStatusMessage('GitHub connection successful!', 'success');
-                return true;
-            } catch (error) {
-                console.error('Error testing GitHub connection:', error);
-                showStatusMessage('GitHub connection failed', 'error');
-                return false;
-            }
-        }
-
-        function saveGitHubSettings() {
-            console.log("Saving GitHub settings");
-            
-            const username = document.getElementById('githubUsername').value;
-            const repo = document.getElementById('githubRepo').value;
-            const token = document.getElementById('githubToken').value;
-            const branch = document.getElementById('githubBranch').value || 'main';
-
-            if (!username || !repo || !token) {
-                showStatusMessage('Please fill in all GitHub settings', 'error');
-                console.error("Missing GitHub settings:", {
-                    username: !!username,
-                    repo: !!repo,
-                    token: !!token
-                });
-                return;
-            }
-
-            // Save settings
-            githubSettings = {
-                username,
-                repo,
-                token,
-                branch
-            };
-            
-            console.log("GitHub settings updated:", {
-                username: githubSettings.username,
-                repo: githubSettings.repo,
-                hasToken: !!githubSettings.token,
-                branch: githubSettings.branch
-            });
-
-            // Store in localStorage (but never store the token in plain text in production)
-            try {
-                localStorage.setItem('githubUsername', username);
-                localStorage.setItem('githubRepo', repo);
-                localStorage.setItem('githubToken', token); // In production, use encryption here
-                localStorage.setItem('githubBranch', branch);
-                console.log("GitHub settings saved to localStorage");
-                
-                showStatusMessage('GitHub settings saved successfully', 'success');
-                document.getElementById('githubTokenPanel').style.display = 'none';
-                
-                // Try to load config from GitHub
-                loadConfigFromGitHub();
-                
-                // Enter admin mode
-                enterAdminMode();
-            } catch (e) {
-                console.warn('localStorage not available (likely due to sandbox restrictions):', e);
-                
-                // Still set the settings for this session
-                showStatusMessage('GitHub settings saved for this session', 'success');
-                document.getElementById('githubTokenPanel').style.display = 'none';
-                
-                // Try to load config from GitHub
-                loadConfigFromGitHub();
-                
-                // Enter admin mode
-                enterAdminMode();
-            }
-        }
-
-        async function loadConfigFromGitHub() {
-            const button = document.getElementById('saveGithubSettings');
-            if (button) {
-                const originalText = button.textContent;
-                button.innerHTML = '<span class="loading-spinner"></span>Loading...';
-                button.disabled = true;
-
-                setTimeout(() => {
-                    button.textContent = originalText;
-                    button.disabled = false;
-                }, 3000);
-            }
-
-            const config = await fetchConfigFromGitHub();
-            
-            if (config && config.toolsData) {
-                toolsData = config.toolsData;
-                renderDashboard();
-                showStatusMessage('Configuration loaded from GitHub', 'success');
-            } else if (config === null) {
-                // Config doesn't exist yet, save the current config
-                saveConfigToGitHub();
-            }
-        }
-
-        // Admin mode functionality
-        let isAdminMode = false;
-        const adminPassword = "admin123"; // Simple demo password - in production use a more secure approach
-        let currentToolId = null;
-        
-        // Toggle admin login panel
-        document.getElementById('adminToggle').addEventListener('click', function() {
-            if (isAdminMode) {
-                exitAdminMode();
-            } else {
-                document.getElementById('adminLoginPanel').style.display = 'block';
-            }
-        });
-        
-        // Close admin login panel
-        document.getElementById('cancelLogin').addEventListener('click', function() {
-            document.getElementById('adminLoginPanel').style.display = 'none';
-        });
-        
-        // Attempt login
-        document.getElementById('loginAdmin').addEventListener('click', function() {
-            const password = document.getElementById('adminPassword').value;
-            if (password === adminPassword) {
-                document.getElementById('adminLoginPanel').style.display = 'none';
-                
-                // Check if GitHub settings are configured
-                if (!githubSettings.username || !githubSettings.repo || !githubSettings.token) {
-                    // Show GitHub configuration panel
-                    document.getElementById('githubTokenPanel').style.display = 'block';
-                } else {
-                    // GitHub already configured, enter admin mode
-                    enterAdminMode();
-                }
-                
-                document.getElementById('adminPassword').value = '';
-            } else {
-                showStatusMessage('Incorrect password', 'error');
-            }
-        });
-        
-        // Enter admin mode
-        function enterAdminMode() {
-            isAdminMode = true;
-            document.body.classList.add('admin-mode');
-            document.querySelectorAll('.tool-card').forEach(card => {
-                card.classList.add('admin-mode');
-            });
-            document.getElementById('adminToggle').textContent = '✓';
-            document.getElementById('adminToggle').style.backgroundColor = 'var(--emerald)';
-            document.getElementById('adminToggle').style.color = 'white';
-            
-            // Initialize drag and drop
-            initDragAndDrop();
-        }
-        
-        // Exit admin mode
-        function exitAdminMode() {
-            isAdminMode = false;
-            document.body.classList.remove('admin-mode');
-            document.querySelectorAll('.tool-card').forEach(card => {
-                card.classList.remove('admin-mode');
-            });
-            document.getElementById('adminPanel').style.display = 'none';
-            document.getElementById('adminToggle').textContent = '⚙️';
-            document.getElementById('adminToggle').style.backgroundColor = 'white';
-            document.getElementById('adminToggle').style.color = 'initial';
-            
-            // Hide save order button
-            document.getElementById('saveOrderBtn').classList.remove('show');
-            
-            // Destroy sortable if it exists
-            if (sortableInstance) {
-                sortableInstance.destroy();
-                sortableInstance = null;
-            }
-            
-            // If order has changed but not saved, save it now
-            if (orderChanged) {
-                saveConfigToGitHub();
-            }
-        }
-        
-        // Open edit panel for a specific tool
-        function openEditPanel(toolId) {
-            currentToolId = toolId;
-            const tool = toolsData.find(t => t.id === toolId);
-            
-            // Populate form fields
-            document.getElementById('toolIcon').value = tool.icon;
-            document.getElementById('toolTitle').value = tool.title;
-            document.getElementById('toolDescription').value = tool.description;
-            document.getElementById('toolLink').value = tool.url;
-            
-            // Update icon preview
-            document.querySelector('.icon-preview .material-icons').textContent = tool.icon;
-            
-            // Show the panel
-            document.getElementById('adminPanel').style.display = 'block';
-            
-            // Build and set up the color picker
-            setupColorPicker(tool.color);
-        }
-        
-        // Set up the color picker
-        function setupColorPicker(selectedColor) {
-            const colorPicker = document.getElementById('colorPicker');
-            colorPicker.innerHTML = ''; // Clear existing swatches
-            
-            // Create an object to store color names and values for easy lookup
-            const colorMap = {
-                'turquoise': 'var(--turquoise)',
-                'emerald': 'var(--emerald)',
-                'peter-river': 'var(--peter-river)',
-                'amethyst': 'var(--amethyst)',
-                'wet-asphalt': 'var(--wet-asphalt)',
-                'green-sea': 'var(--green-sea)',
-                'nephritis': 'var(--nephritis)',
-                'belize-hole': 'var(--belize-hole)',
-                'wisteria': 'var(--wisteria)',
-                'midnight-blue': 'var(--midnight-blue)',
-                'sunflower': 'var(--sunflower)',
-                'carrot': 'var(--carrot)',
-                'alizarin': 'var(--alizarin)',
-                'clouds': 'var(--clouds)',
-                'concrete': 'var(--concrete)',
-                'orange': 'var(--orange)',
-                'pumpkin': 'var(--pumpkin)',
-                'pomegranate': 'var(--pomegranate)',
-                'silver': 'var(--silver)',
-                'asbestos': 'var(--asbestos)'
-            };
-            
-            // Create a color swatch for each color
-            Object.entries(colorMap).forEach(([name, value]) => {
-                const swatch = document.createElement('div');
-                swatch.className = 'color-swatch';
-                swatch.setAttribute('data-color-value', value);
-                swatch.style.backgroundColor = value;
-                
-                // Add the color name tooltip
-                const nameSpan = document.createElement('span');
-                nameSpan.className = 'color-swatch-name';
-                nameSpan.textContent = name.replace(/-/g, ' ');
-                swatch.appendChild(nameSpan);
-                
-                // Mark as selected if this is the current color
-                if (value === selectedColor) {
-                    swatch.classList.add('selected');
-                }
-                
-                // Add click event
-                swatch.addEventListener('click', function() {
-                    // Remove selected class from all swatches
-                    document.querySelectorAll('.color-swatch').forEach(s => {
-                        s.classList.remove('selected');
-                    });
-                    
-                    // Add selected class to this swatch
-                    this.classList.add('selected');
-                });
-                
-                colorPicker.appendChild(swatch);
-            });
-        }
-        
-        // Save tool changes
-        document.getElementById('saveToolChanges').addEventListener('click', async function() {
-            if (currentToolId) {
-                const toolIndex = toolsData.findIndex(t => t.id === currentToolId);
-                if (toolIndex !== -1) {
-                    // Get the selected color
-                    const selectedSwatch = document.querySelector('.color-swatch.selected');
-                    const selectedColor = selectedSwatch ? selectedSwatch.getAttribute('data-color-value') : toolsData[toolIndex].color;
-                    
-                    // Update tool data
-                    toolsData[toolIndex].icon = document.getElementById('toolIcon').value;
-                    toolsData[toolIndex].title = document.getElementById('toolTitle').value;
-                    toolsData[toolIndex].description = document.getElementById('toolDescription').value;
-                    toolsData[toolIndex].url = document.getElementById('toolLink').value;
-                    toolsData[toolIndex].color = selectedColor;
-                    
-                    // Re-render the dashboard
-                    renderDashboard();
-                    
-                    // If GitHub is configured, save to GitHub
-                    if (githubSettings.username && githubSettings.repo && githubSettings.token) {
-                        const button = document.getElementById('saveToolChanges');
-                        const originalText = button.textContent;
-                        button.innerHTML = '<span class="loading-spinner"></span>Saving...';
-                        button.disabled = true;
-
-                        await saveConfigToGitHub();
-
-                        button.textContent = originalText;
-                        button.disabled = false;
-                    } else {
-                        // Save to localStorage for persistence
-                        try {
-                            localStorage.setItem('dashboardTools', JSON.stringify(toolsData));
-                        } catch (e) {
-                            console.warn('localStorage not available (likely due to sandbox restrictions)');
-                            // Changes will still be visible but won't persist after page refresh in sandboxed environments
-                        }
-                    }
-                    
-                    // Close the panel
-                    document.getElementById('adminPanel').style.display = 'none';
-                }
-            }
-        });
-
-        // Save order button click handler
-        document.getElementById('saveOrderBtn').addEventListener('click', async function() {
-            const button = document.getElementById('saveOrderBtn');
-            button.classList.add('saving');
-            button.innerHTML = '<span class="loading-spinner"></span>Saving...';
-            
-            await saveConfigToGitHub();
-            
-            button.classList.remove('saving');
-            button.innerHTML = '<span class="material-icons">save</span>Save Order';
-        });
-        
-        // Test GitHub connection button
-        document.getElementById('testGithubConnection').addEventListener('click', function() {
-            testGitHubConnection();
-        });
-        
-        // Save GitHub settings button
-        document.getElementById('saveGithubSettings').addEventListener('click', function() {
-            saveGitHubSettings();
-        });
-        
-        // Add key press event for admin password field
-        document.getElementById('adminPassword').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                document.getElementById('loginAdmin').click();
-            }
-        });
-        
-        // Add key press event for GitHub token field
-        document.getElementById('githubToken').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                document.getElementById('saveGithubSettings').click();
-            }
-        });
-        
-        // Status message function
-        function showStatusMessage(message, type) {
-            const statusElement = document.getElementById('statusMessage');
-            statusElement.textContent = message;
-            statusElement.className = 'status-message ' + type;
-            statusElement.classList.add('show');
-            
-            setTimeout(() => {
-                statusElement.classList.remove('show');
-            }, 3000);
-        }
-        
-        // Load settings from localStorage if available
-        function loadSettings() {
-            try {
-                // Try to load GitHub settings
-                const username = localStorage.getItem('githubUsername');
-                const repo = localStorage.getItem('githubRepo');
-                const token = localStorage.getItem('githubToken');
-                const branch = localStorage.getItem('githubBranch') || 'main';
-                
-                if (username && repo) {
-                    githubSettings = {
-                        username,
-                        repo,
-                        token,
-                        branch
-                    };
-                    
-                    // Populate GitHub settings form
-                    document.getElementById('githubUsername').value = username;
-                    document.getElementById('githubRepo').value = repo;
-                    document.getElementById('githubToken').value = token || '';
-                    document.getElementById('githubBranch').value = branch;
-                } else {
-                    // Try to infer GitHub settings from URL
-                    tryInferGitHubSettings();
-                }
-                
-                // Try to load tools data from localStorage as fallback
-                const savedTools = localStorage.getItem('dashboardTools');
-                if (savedTools) {
-                    try {
-                        toolsData = JSON.parse(savedTools);
-                    } catch (e) {
-                        console.error('Error parsing saved tools data:', e);
-                        initializeDefaultTools();
-                    }
-                } else {
-                    initializeDefaultTools();
-                }
-            } catch (e) {
-                console.warn('localStorage not available (likely due to sandbox restrictions)');
-                // Try to infer GitHub settings from URL
-                tryInferGitHubSettings();
-                // Continue with default data in sandboxed environments
-                initializeDefaultTools();
-            }
-        }
-        
-        // Try to infer GitHub settings from the current URL
-        function tryInferGitHubSettings() {
-            try {
-                const url = new URL(window.location.href);
-                const pathParts = url.pathname.split('/').filter(part => part);
-                
-                // Check if we're on GitHub Pages
-                if (url.hostname.endsWith('github.io')) {
-                    const username = url.hostname.replace('.github.io', '');
-                    const repo = pathParts[0] || '';
-                    
-                    if (username && repo) {
-                        githubSettings.username = username;
-                        githubSettings.repo = repo;
-                        githubSettings.token = ''; // No token for public reading
-                        githubSettings.branch = 'main';
-                        
-                        console.log('Inferred GitHub settings from URL:', githubSettings);
-                    }
-                }
-            } catch (e) {
-                console.warn('Error inferring GitHub settings from URL:', e);
-            }
-        }
-        
-        // Load config from GitHub for non-admin users (public read)
-        async function loadPublicConfigFromGitHub() {
-            if (!githubSettings.username || !githubSettings.repo) {
-                return null;
-            }
-            
-            try {
-                // For public repositories, we can read without a token
-                const url = `https://raw.githubusercontent.com/${githubSettings.username}/${githubSettings.repo}/${githubSettings.branch}/dashboard-config.json`;
-                
-                const response = await fetch(url);
-                
-                if (response.status === 404) {
-                    console.log('Configuration file not found on GitHub');
-                    return null;
-                }
-                
-                if (!response.ok) {
-                    throw new Error(`GitHub request error: ${response.status}`);
-                }
-                
-                const config = await response.json();
-                return config;
-            } catch (error) {
-                console.error('Error loading public config from GitHub:', error);
-                return null;
-            }
-        }
-        
-        // Initialize the dashboard
-        window.addEventListener('DOMContentLoaded', async function() {
-            // Use predefined GitHub settings for this specific project
-            githubSettings = {
-                username: 'adamismyusername',
-                repo: 'sfdash',
-                token: '', // Token will be entered by admin
-                branch: 'main'
-            };
-            
-            // Populate GitHub settings form with predefined values
-            document.getElementById('githubUsername').value = githubSettings.username;
-            document.getElementById('githubRepo').value = githubSettings.repo;
-            document.getElementById('githubBranch').value = githubSettings.branch;
-            
-            // Try to load stored token from localStorage
-            try {
-                const token = localStorage.getItem('githubToken');
-                if (token) {
-                    githubSettings.token = token;
-                    document.getElementById('githubToken').value = token;
-                }
-                
-                // Load show hidden tools preference
-                const showHiddenTools = localStorage.getItem('showHiddenTools');
-                document.getElementById('showHiddenTools').checked = showHiddenTools === 'true';
-            } catch (e) {
-                console.warn('localStorage not available');
-                // Default to not showing hidden tools
-                document.getElementById('showHiddenTools').checked = false;
-            }
-            
-            // Initialize with default tools in case we can't load from GitHub
-            initializeDefaultTools();
-            
-            // Try to load config from GitHub (even for non-admin)
-            let config = null;
-            
-            // Try using the API with token if token is available
-            if (githubSettings.token) {
-                config = await fetchConfigFromGitHub();
-            }
-            
-            // If that failed or no token available, try public access
-            if (!config) {
-                config = await loadPublicConfigFromGitHub();
-            }
-            
-            // If we got config, update the tools data
-            if (config && config.toolsData) {
-                toolsData = config.toolsData;
-                
-                // Ensure all tools have the hidden property
-                toolsData.forEach(tool => {
-                    if (tool.hidden === undefined) {
-                        tool.hidden = false;
-                    }
-                });
-                
-                // Save to localStorage as backup
-                try {
-                    localStorage.setItem('dashboardTools', JSON.stringify(toolsData));
-                } catch (e) {
-                    console.warn('Could not save to localStorage');
-                }
-            }
-            
-            // Render the dashboard with whatever data we have
-            renderDashboard();
-        });
-
-        // Function to automatically resize for iframe
-        function resizeForIframe() {
-            if (window.self !== window.top) {
-                // We're in an iframe
-                const height = document.body.scrollHeight;
-                window.parent.postMessage({ type: 'resize', height }, '*');
-            }
-        }
-
-        // Listen for window resize and content changes
-        window.addEventListener('resize', resizeForIframe);
-        window.addEventListener('load', resizeForIframe);
-        
-        // Check for iframe resize periodically
-        setInterval(resizeForIframe, 500);
-    </script>
+                const iconDiv
