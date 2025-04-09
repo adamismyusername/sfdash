@@ -1,6 +1,14 @@
 {
   "toolsData": [
     {
+      "id": 22,
+      "icon": "network_check",
+      "title": "Reorder Test 1",
+      "description": "Checking the reordering",
+      "url": "#",
+      "color": "var(--wisteria)"
+    },
+    {
       "id": 2,
       "icon": "html",
       "title": "Creative Generator (v1)",
@@ -31,14 +39,6 @@
       "description": "This is a description for Tool 11. It explains what this tool does and how to use it.",
       "url": "#",
       "color": "var(--alizarin)"
-    },
-    {
-      "id": 22,
-      "icon": "network_check",
-      "title": "Reorder Test 1",
-      "description": "Checking the reordering",
-      "url": "#",
-      "color": "var(--wisteria)"
     },
     {
       "id": 15,
