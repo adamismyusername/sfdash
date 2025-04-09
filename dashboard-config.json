@@ -25,14 +25,6 @@
       "color": "var(--amethyst)"
     },
     {
-      "id": 3,
-      "icon": "build",
-      "title": "Drag/Drop Test",
-      "description": "This is a test of drag and drop",
-      "url": "#",
-      "color": "var(--peter-river)"
-    },
-    {
       "id": 5,
       "icon": "info",
       "title": "Tool 5",
@@ -95,6 +87,14 @@
       "description": "This is a description for Tool 12. It explains what this tool does and how to use it.",
       "url": "#",
       "color": "var(--carrot)"
+    },
+    {
+      "id": 3,
+      "icon": "build",
+      "title": "Drag/Drop Test",
+      "description": "This is a test of drag and drop",
+      "url": "#",
+      "color": "var(--peter-river)"
     },
     {
       "id": 13,
