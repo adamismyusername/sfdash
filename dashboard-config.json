@@ -38,7 +38,7 @@
       "title": "Color Test",
       "description": "Testing the color selection",
       "url": "#",
-      "color": "var(--pomegranate)"
+      "color": "var(--alizarin)"
     },
     {
       "id": 9,
@@ -46,7 +46,7 @@
       "title": "Tool 9",
       "description": "This is a description for Tool 9. It explains what this tool does and how to use it.",
       "url": "#",
-      "color": "var(--pomegranate)"
+      "color": "var(--alizarin)"
     },
     {
       "id": 7,
@@ -62,7 +62,7 @@
       "title": "Tool 11",
       "description": "This is a description for Tool 11. It explains what this tool does and how to use it.",
       "url": "#",
-      "color": "var(--pomegranate)"
+      "color": "var(--alizarin)"
     },
     {
       "id": 12,
@@ -110,7 +110,7 @@
       "title": "Tool 16",
       "description": "This is a description for Tool 16. It explains what this tool does and how to use it.",
       "url": "#",
-      "color": "var(--orange)"
+      "color": "var(--clouds)"
     },
     {
       "id": 17,
