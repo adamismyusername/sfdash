@@ -2,11 +2,11 @@
   "toolsData": [
     {
       "id": 2,
-      "icon": "analytics",
-      "title": "JSON Test",
-      "description": "This is a test to see if the JSON storage on GitHub is working. ",
-      "url": "https://google.com",
-      "color": "var(--emerald)"
+      "icon": "html",
+      "title": "Creative Generator (Standard)",
+      "description": "Automatically generate creatives with proper tracking links",
+      "url": "https://generator.goldcocreatives.com/generate",
+      "color": "var(--turquoise)"
     },
     {
       "id": 1,
@@ -126,7 +126,7 @@
       "title": "Tool 18",
       "description": "This is a description for Tool 18. It explains what this tool does and how to use it.",
       "url": "#",
-      "color": "var(--pomegranate)"
+      "color": "var(--silver)"
     },
     {
       "id": 19,
