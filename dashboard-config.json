@@ -65,14 +65,6 @@
       "color": "var(--clouds)"
     },
     {
-      "id": 7,
-      "icon": "pie_chart",
-      "title": "Console Test",
-      "description": "Testing console logging",
-      "url": "#",
-      "color": "var(--pomegranate)"
-    },
-    {
       "id": 31,
       "icon": "task",
       "title": "Tool 31",
