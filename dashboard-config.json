@@ -67,10 +67,10 @@
     {
       "id": 31,
       "icon": "task",
-      "title": "Tool 31",
-      "description": "This is a description for Tool 31. It explains what this tool does and how to use it.",
+      "title": "Remember Me Test",
+      "description": "Testing the \"Remember Me\" function for admins. ",
       "url": "#",
-      "color": "var(--sunflower)"
+      "color": "var(--pomegranate)"
     },
     {
       "id": 18,
