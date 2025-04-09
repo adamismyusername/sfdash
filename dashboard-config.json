@@ -3,17 +3,9 @@
     {
       "id": 2,
       "icon": "html",
-      "title": "Creative Generator (Standard)",
+      "title": "Creative Generator (v1)",
       "description": "Automatically generate creatives with proper tracking links",
       "url": "https://generator.goldcocreatives.com/generate",
-      "color": "var(--turquoise)"
-    },
-    {
-      "id": 1,
-      "icon": "dashboard",
-      "title": "4 In 1 Creative Generator",
-      "description": "Updates all links in the the 4 in 1 creative with values entered into the form fields. ",
-      "url": "https://adamismyusername.github.io/4in1/",
       "color": "var(--turquoise)"
     },
     {
@@ -39,6 +31,14 @@
       "description": "Testing the color selection",
       "url": "#",
       "color": "var(--alizarin)"
+    },
+    {
+      "id": 1,
+      "icon": "html",
+      "title": "Creative Generator (4 in 1)",
+      "description": "Updates all links in the the 4 in 1 creative with values entered into the form fields. ",
+      "url": "https://adamismyusername.github.io/4in1/",
+      "color": "var(--turquoise)"
     },
     {
       "id": 9,
