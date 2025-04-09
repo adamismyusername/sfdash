@@ -744,6 +744,10 @@
                     <label for="adminPassword">Password:</label>
                     <input type="password" id="adminPassword">
                 </div>
+                <div class="form-group">
+                    <input type="checkbox" id="rememberMe" style="width: auto; margin-right: 8px;">
+                    <label for="rememberMe" style="display: inline;">Remember me for 7 days</label>
+                </div>
                 <div class="form-actions">
                     <button id="loginAdmin" class="admin-login-btn">Login</button>
                     <button id="cancelLogin" class="admin-cancel-btn">Cancel</button>
@@ -910,6 +914,69 @@ dataDiv.textContent = '[Error displaying data]';
         let isAdminMode = false;
         const adminPassword = "admin123";
         let currentToolId = null;
+
+        /* Authentication token management */
+function generateAuthToken() {
+    // Generate a simple random token
+    const randomToken = Math.random().toString(36).substring(2, 15) + 
+                        Math.random().toString(36).substring(2, 15);
+    
+        // Set expiration to 7 days from now
+        const expirationDate = new Date();
+        expirationDate.setDate(expirationDate.getDate() + 7);
+        
+        return {
+            token: randomToken,
+            expires: expirationDate.getTime()
+        };
+        }
+    
+        function saveAuthToken(authToken) {
+            try {
+                localStorage.setItem('authToken', JSON.stringify(authToken));
+                debug('Auth token saved', { expires: new Date(authToken.expires).toLocaleString() });
+            } catch (e) {
+                debug('localStorage not available for saving auth token', e);
+            }
+        }
+        
+        function getAuthToken() {
+            try {
+                const tokenData = localStorage.getItem('authToken');
+                if (tokenData) {
+                    return JSON.parse(tokenData);
+                }
+            } catch (e) {
+                debug('Error getting auth token', e);
+            }
+            return null;
+        }
+        
+        function clearAuthToken() {
+            try {
+                localStorage.removeItem('authToken');
+                debug('Auth token cleared');
+            } catch (e) {
+                debug('Error clearing auth token', e);
+            }
+        }
+        
+        function checkAuthToken() {
+            const tokenData = getAuthToken();
+            if (tokenData) {
+                const now = new Date().getTime();
+                if (now < tokenData.expires) {
+                    debug('Valid auth token found', { 
+                        expiresIn: Math.round((tokenData.expires - now) / (1000 * 60 * 60 * 24)) + ' days' 
+                    });
+                    return true;
+                } else {
+                    debug('Auth token expired');
+                    clearAuthToken();
+                }
+            }
+            return false;
+        }
         
         /* Initialize default tools */
         function initializeDefaultTools() {
@@ -1430,6 +1497,9 @@ dataDiv.textContent = '[Error displaying data]';
         function exitAdminMode() {
             debug('Exiting admin mode');
             isAdminMode = false;
+            // Clear auth token when manually logging out
+            clearAuthToken();
+            document.body.classList.remove('admin-mode');
             document.body.classList.remove('admin-mode');
             document.querySelectorAll('.tool-card').forEach(card => {
                 card.classList.remove('admin-mode');
@@ -1652,6 +1722,15 @@ dataDiv.textContent = '[Error displaying data]';
                 const password = document.getElementById('adminPassword').value;
                 if (password === adminPassword) {
                     document.getElementById('adminLoginPanel').style.display = 'none';
+                    
+                    // Save authentication token if "Remember Me" is checked
+                    const rememberMe = document.getElementById('rememberMe').checked;
+                    if (rememberMe) {
+                        const authToken = generateAuthToken();
+                        saveAuthToken(authToken);
+                        debug('User authenticated with "Remember Me"');
+                    }
+                    
                     if (!githubSettings.token) {
                         document.getElementById('githubTokenPanel').style.display = 'block';
                     } else {
@@ -1875,6 +1954,16 @@ if (currentToolId && confirm('Are you sure you want to delete this tool?')) {
                     debug('Could not save loaded tools to localStorage', e);
                 }
             }
+            
+            // Check for saved authentication token
+            if (checkAuthToken()) {
+                debug('Auto-login with saved token');
+                if (githubSettings.token) {
+                    enterAdminMode();
+                } else {
+                    document.getElementById('githubTokenPanel').style.display = 'block';
+                }
+            }    
             
             // Render the dashboard
             renderDashboard();
