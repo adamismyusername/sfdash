@@ -107,10 +107,10 @@
     {
       "id": 22,
       "icon": "network_check",
-      "title": "Tool 22",
-      "description": "This is a description for Tool 22. It explains what this tool does and how to use it.",
+      "title": "Reorder Test 1",
+      "description": "Checking the reordering",
       "url": "#",
-      "color": "var(--emerald)"
+      "color": "var(--wisteria)"
     },
     {
       "id": 34,
