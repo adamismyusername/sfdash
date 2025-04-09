@@ -935,7 +935,24 @@ dataDiv.textContent = '[Error displaying data]';
             const dashboard = document.getElementById('dashboard');
             dashboard.innerHTML = '';
             
-            toolsData.forEach((tool) => {
+            // Create a temporary array for reordering
+            const reorderedTools = [];
+            // Calculate how many tools per row (currently 4 in desktop view)
+            const itemsPerRow = 4;
+            const rows = Math.ceil(toolsData.length / itemsPerRow);
+            
+            // Fill the reordered array
+            for (let i = 0; i < itemsPerRow; i++) { // Column first
+                for (let j = 0; j < rows; j++) { // Then row
+                    const index = j * itemsPerRow + i;
+                    if (index < toolsData.length) {
+                        reorderedTools.push(toolsData[index]);
+                    }
+                }
+            }
+            
+            // Now use reorderedTools instead of toolsData for rendering
+            reorderedTools.forEach((tool) => {
                 const card = document.createElement('div');
                 card.className = 'tool-card';
                 card.setAttribute('data-tool-id', tool.id);
