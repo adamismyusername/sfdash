@@ -746,7 +746,7 @@
                 </div>
                 <div class="form-group">
                     <input type="checkbox" id="rememberMe" style="width: auto; margin-right: 8px;">
-                    <label for="rememberMe" style="display: inline;">Remember me for 7 days</label>
+                    <label for="rememberMe" style="display: inline;">Remember Me</label>
                 </div>
                 <div class="form-actions">
                     <button id="loginAdmin" class="admin-login-btn">Login</button>
@@ -963,21 +963,28 @@ function generateAuthToken() {
         
         function checkAuthToken() {
             const tokenData = getAuthToken();
+            debug('Checking auth token', tokenData); // Add more detailed logging
+            
             if (tokenData) {
                 const now = new Date().getTime();
                 if (now < tokenData.expires) {
                     debug('Valid auth token found', { 
-                        expiresIn: Math.round((tokenData.expires - now) / (1000 * 60 * 60 * 24)) + ' days' 
+                        expiresIn: Math.round((tokenData.expires - now) / (1000 * 60 * 60 * 24)) + ' days',
+                        expires: new Date(tokenData.expires).toLocaleString()
                     });
                     return true;
                 } else {
-                    debug('Auth token expired');
+                    debug('Auth token expired', {
+                        now: new Date(now).toLocaleString(),
+                        tokenExpires: new Date(tokenData.expires).toLocaleString()
+                    });
                     clearAuthToken();
                 }
+            } else {
+                debug('No auth token found');
             }
             return false;
         }
-        
         /* Initialize default tools */
         function initializeDefaultTools() {
             debug('Initializing default tools');
@@ -1497,9 +1504,7 @@ function generateAuthToken() {
         function exitAdminMode() {
             debug('Exiting admin mode');
             isAdminMode = false;
-            // Clear auth token when manually logging out
-            clearAuthToken();
-            document.body.classList.remove('admin-mode');
+            // Remove this line: clearAuthToken();
             document.body.classList.remove('admin-mode');
             document.querySelectorAll('.tool-card').forEach(card => {
                 card.classList.remove('admin-mode');
@@ -1725,10 +1730,12 @@ function generateAuthToken() {
                     
                     // Save authentication token if "Remember Me" is checked
                     const rememberMe = document.getElementById('rememberMe').checked;
+                    debug('Remember me checked:', rememberMe); // Add explicit debugging
+                    
                     if (rememberMe) {
                         const authToken = generateAuthToken();
                         saveAuthToken(authToken);
-                        debug('User authenticated with "Remember Me"');
+                        debug('User authenticated with "Remember Me"', authToken);
                     }
                     
                     if (!githubSettings.token) {
@@ -1956,14 +1963,18 @@ if (currentToolId && confirm('Are you sure you want to delete this tool?')) {
             }
             
             // Check for saved authentication token
-            if (checkAuthToken()) {
+            const hasValidToken = checkAuthToken();
+            debug('Auto-login check result:', hasValidToken);
+            if (hasValidToken) {
                 debug('Auto-login with saved token');
                 if (githubSettings.token) {
+                    debug('Token exists, entering admin mode directly');
                     enterAdminMode();
                 } else {
+                    debug('No GitHub token, showing GitHub panel');
                     document.getElementById('githubTokenPanel').style.display = 'block';
                 }
-            }    
+            } 
             
             // Render the dashboard
             renderDashboard();
