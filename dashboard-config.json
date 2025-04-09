@@ -46,7 +46,7 @@
       "title": "Tool 9",
       "description": "This is a description for Tool 9. It explains what this tool does and how to use it.",
       "url": "#",
-      "color": "var(--wisteria)"
+      "color": "var(--pomegranate)"
     },
     {
       "id": 7,
@@ -54,7 +54,7 @@
       "title": "Console Test",
       "description": "Testing console logging",
       "url": "#",
-      "color": "var(--nephritis)"
+      "color": "var(--pomegranate)"
     },
     {
       "id": 11,
@@ -62,7 +62,7 @@
       "title": "Tool 11",
       "description": "This is a description for Tool 11. It explains what this tool does and how to use it.",
       "url": "#",
-      "color": "var(--sunflower)"
+      "color": "var(--pomegranate)"
     },
     {
       "id": 12,
@@ -70,7 +70,7 @@
       "title": "Tool 12",
       "description": "This is a description for Tool 12. It explains what this tool does and how to use it.",
       "url": "#",
-      "color": "var(--carrot)"
+      "color": "var(--peter-river)"
     },
     {
       "id": 3,
@@ -86,7 +86,7 @@
       "title": "Tool 13",
       "description": "This is a description for Tool 13. It explains what this tool does and how to use it.",
       "url": "#",
-      "color": "var(--alizarin)"
+      "color": "var(--peter-river)"
     },
     {
       "id": 14,
@@ -94,7 +94,7 @@
       "title": "Tool 14",
       "description": "This is a description for Tool 14. It explains what this tool does and how to use it.",
       "url": "#",
-      "color": "var(--clouds)"
+      "color": "var(--peter-river)"
     },
     {
       "id": 15,
@@ -102,7 +102,7 @@
       "title": "Tool 15",
       "description": "This is a description for Tool 15. It explains what this tool does and how to use it.",
       "url": "#",
-      "color": "var(--concrete)"
+      "color": "var(--clouds)"
     },
     {
       "id": 16,
