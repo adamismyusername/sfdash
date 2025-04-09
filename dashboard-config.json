@@ -49,14 +49,6 @@
       "color": "var(--wisteria)"
     },
     {
-      "id": 10,
-      "icon": "schedule",
-      "title": "Tool 10",
-      "description": "This is a description for Tool 10. It explains what this tool does and how to use it.",
-      "url": "#",
-      "color": "var(--midnight-blue)"
-    },
-    {
       "id": 7,
       "icon": "pie_chart",
       "title": "Console Test",
