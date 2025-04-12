@@ -99,10 +99,10 @@
     {
       "id": 26,
       "icon": "integration_instructions",
-      "title": "Tool 26",
-      "description": "This is a description for Tool 26. It explains what this tool does and how to use it.",
-      "url": "#",
-      "color": "var(--green-sea)"
+      "title": "Google | Sheets",
+      "description": "",
+      "url": "https://docs.google.com/spreadsheets/u/0/?tgif=c",
+      "color": "var(--nephritis)"
     },
     {
       "id": 32,
