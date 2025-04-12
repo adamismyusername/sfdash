@@ -3,8 +3,8 @@
     {
       "id": 22,
       "icon": "view_timeline",
-      "title": "Monday.com | Project Manager",
-      "description": "",
+      "title": "Monday | Project Manager",
+      "description": "Project Manager for Goldco",
       "url": "https://goldco-force.monday.com/",
       "color": "var(--wisteria)"
     },
