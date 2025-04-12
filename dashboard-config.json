@@ -66,10 +66,10 @@
     },
     {
       "id": 14,
-      "icon": "people",
-      "title": "Tool 14",
-      "description": "This is a description for Tool 14. It explains what this tool does and how to use it.",
-      "url": "#",
+      "icon": "add_to_drive",
+      "title": "Google Drive",
+      "description": "Quick link to Google Drive",
+      "url": "https://drive.google.com/drive/home",
       "color": "var(--peter-river)"
     },
     {
