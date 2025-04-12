@@ -5,8 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Marketing Tools Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome - Replace Material Icons with Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <!-- Add SortableJS for drag and drop functionality -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <style>
@@ -133,9 +132,8 @@
             font-size: 24px;
         }
 
-        /* Font Awesome styling */
-        .tool-icon i {
-            font-size: 24px;
+        .tool-icon span {
+            font-size: 28px;
         }
 
         .tool-info {
@@ -278,7 +276,7 @@
             border-radius: 6px;
         }
         
-        .icon-preview i {
+        .icon-preview .material-icons {
             font-size: 24px;
         }
         
@@ -578,7 +576,7 @@
             opacity: 0.8;
         }
 
-        .drag-handle i {
+        .drag-handle .material-icons {
             font-size: 16px;
             color: var(--asbestos);
         }
@@ -678,39 +676,6 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
-
-        /* Style for Font Awesome icon selector */
-        .icon-selector {
-            display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            gap: 8px;
-            max-height: 200px;
-            overflow-y: auto;
-            margin-top: 10px;
-            padding: 5px;
-            background-color: #f5f7fa;
-            border-radius: 6px;
-        }
-
-        .icon-selector-item {
-            width: 100%;
-            aspect-ratio: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            border-radius: 4px;
-            transition: all 0.2s ease;
-        }
-
-        .icon-selector-item:hover {
-            background-color: var(--clouds);
-        }
-
-        .icon-selector-item.selected {
-            background-color: var(--peter-river);
-            color: white;
-        }
     </style>
 </head>
 <body>
@@ -721,12 +686,12 @@
     </div>
 
     <div id="newToolBtn" class="save-order-btn" style="left: 100px; background-color: var(--peter-river); display: none;">
-        <i class="fa-solid fa-plus"></i>
+        <span class="material-icons">add</span>
         New Tool
     </div>
 
     <button id="saveOrderBtn" class="save-order-btn">
-        <i class="fa-solid fa-floppy-disk"></i>
+        <span class="material-icons">save</span>
         Save Order
     </button>
 
@@ -739,16 +704,10 @@
             <div class="admin-form">
                 <div class="form-group">
                     <label for="toolIcon">Icon:</label>
-                    <input type="text" id="toolIcon" placeholder="Icon name (e.g. fa-chart-pie)">
+                    <input type="text" id="toolIcon" placeholder="Icon name">
                     <div class="icon-preview">
-                        <i class="fa-solid fa-grip"></i>
+                        <span class="material-icons">dashboard</span>
                         <small>Preview</small>
-                    </div>
-                    <button id="showIconSelector" class="admin-save-btn" style="margin-top: 10px; background-color: var(--clouds); color: var(--wet-asphalt); font-size: 14px; padding: 6px 10px;">
-                        Choose Icon
-                    </button>
-                    <div class="icon-selector" id="iconSelector" style="display: none;">
-                        <!-- Icons will be added here dynamically -->
                     </div>
                 </div>
                 <div class="form-group">
@@ -837,12 +796,8 @@
         </div>
     </div>
 
-    <div id="adminToggle" class="admin-toggle" title="Admin Mode">
-        <i class="fa-solid fa-gear"></i>
-    </div>
-    <div id="debugToggle" class="debug-toggle" title="Debug Panel">
-        <i class="fa-solid fa-bug"></i>
-    </div>
+    <div id="adminToggle" class="admin-toggle" title="Admin Mode">⚙️</div>
+    <div id="debugToggle" class="debug-toggle" title="Debug Panel">🐞</div>
     <div id="debugPanel" class="debug-panel"></div>
 
     <div id="statusMessage" class="status-message"></div>
@@ -867,25 +822,15 @@
             'var(--silver)', 'var(--asbestos)'
         ];
 
-        /* Available Font Awesome icons - updated from Material Icons */
+        /* Available Material icons */
         const toolIcons = [
-            'fa-grip', 'fa-chart-simple', 'fa-hammer', 'fa-code', 'fa-circle-info', 'fa-sliders',
-            'fa-chart-pie', 'fa-chart-bar', 'fa-chart-line', 'fa-clock', 'fa-bell', 'fa-envelope',
-            'fa-comment', 'fa-user', 'fa-users', 'fa-folder', 'fa-cloud', 'fa-shield-halved',
-            'fa-magnifying-glass', 'fa-circle-question', 'fa-tv', 'fa-wifi', 'fa-file-lines', 'fa-square-check',
-            'fa-lightbulb', 'fa-terminal', 'fa-microchip', 'fa-eye', 'fa-database', 'fa-user-tie',
-            'fa-list-check', 'fa-gears', 'fa-plug', 'fa-chart-area', 'fa-mobile-screen', 'fa-screwdriver-wrench'
+            'dashboard', 'analytics', 'build', 'code', 'info', 'settings',
+            'pie_chart', 'bar_chart', 'data_usage', 'schedule', 'notifications', 'mail',
+            'chat', 'people', 'groups', 'folder', 'cloud', 'security',
+            'search', 'help', 'important_devices', 'network_check', 'description', 'fact_check',
+            'insights', 'integration_instructions', 'memory', 'pageview', 'storage', 'supervisor_account',
+            'task', 'api', 'cable', 'query_stats', 'devices', 'app_settings_alt'
         ];
-
-        /* Font Awesome icon categories for the selector */
-        const iconCategories = {
-            'Business': ['fa-briefcase', 'fa-chart-line', 'fa-chart-pie', 'fa-chart-bar', 'fa-money-bill', 'fa-handshake', 'fa-building', 'fa-user-tie', 'fa-presentation'],
-            'Communication': ['fa-envelope', 'fa-phone', 'fa-comment', 'fa-message', 'fa-comments', 'fa-paper-plane', 'fa-share', 'fa-bullhorn', 'fa-bell'],
-            'Technology': ['fa-computer', 'fa-laptop', 'fa-mobile', 'fa-tablet', 'fa-code', 'fa-microchip', 'fa-server', 'fa-database', 'fa-wifi'],
-            'UI Elements': ['fa-sliders', 'fa-toggle-on', 'fa-check', 'fa-xmark', 'fa-trash', 'fa-floppy-disk', 'fa-gear', 'fa-download', 'fa-upload', 'fa-pen'],
-            'Media': ['fa-image', 'fa-camera', 'fa-video', 'fa-play', 'fa-music', 'fa-headphones', 'fa-film', 'fa-volume-high'],
-            'Common': ['fa-home', 'fa-user', 'fa-users', 'fa-calendar', 'fa-clock', 'fa-location-dot', 'fa-star', 'fa-heart', 'fa-circle']
-        };
 
         /* Debug logging */
         const debugLog = [];
@@ -950,7 +895,7 @@
                             dataDiv.textContent = String(entry.data);
                         }
                     } catch (e) {
-                        dataDiv.textContent = '[Error displaying data]';
+dataDiv.textContent = '[Error displaying data]';
                     }
                     
                     logLine.appendChild(dataDiv);
@@ -971,21 +916,21 @@
         let currentToolId = null;
 
         /* Authentication token management */
-        function generateAuthToken() {
-            // Generate a simple random token
-            const randomToken = Math.random().toString(36).substring(2, 15) + 
-                                Math.random().toString(36).substring(2, 15);
-            
-            // Set expiration to 7 days from now
-            const expirationDate = new Date();
-            expirationDate.setDate(expirationDate.getDate() + 7);
-            
-            return {
-                token: randomToken,
-                expires: expirationDate.getTime()
-            };
-        }
+function generateAuthToken() {
+    // Generate a simple random token
+    const randomToken = Math.random().toString(36).substring(2, 15) + 
+                        Math.random().toString(36).substring(2, 15);
+    
+        // Set expiration to 7 days from now
+        const expirationDate = new Date();
+        expirationDate.setDate(expirationDate.getDate() + 7);
         
+        return {
+            token: randomToken,
+            expires: expirationDate.getTime()
+        };
+        }
+    
         function saveAuthToken(authToken) {
             try {
                 localStorage.setItem('authToken', JSON.stringify(authToken));
@@ -1018,7 +963,7 @@
         
         function checkAuthToken() {
             const tokenData = getAuthToken();
-            debug('Checking auth token', tokenData);
+            debug('Checking auth token', tokenData); // Add more detailed logging
             
             if (tokenData) {
                 const now = new Date().getTime();
@@ -1040,52 +985,6 @@
             }
             return false;
         }
-
-        /* Convert Material Design icon name to Font Awesome icon name */
-        function convertToFontAwesomeIcon(materialIcon) {
-            // Mapping of common Material Design icons to Font Awesome equivalents
-            const iconMap = {
-                'dashboard': 'fa-grip',
-                'analytics': 'fa-chart-simple',
-                'build': 'fa-hammer',
-                'code': 'fa-code',
-                'info': 'fa-circle-info',
-                'settings': 'fa-sliders',
-                'pie_chart': 'fa-chart-pie',
-                'bar_chart': 'fa-chart-bar',
-                'data_usage': 'fa-chart-line',
-                'schedule': 'fa-clock',
-                'notifications': 'fa-bell',
-                'mail': 'fa-envelope',
-                'chat': 'fa-comment',
-                'people': 'fa-user',
-                'groups': 'fa-users',
-                'folder': 'fa-folder',
-                'cloud': 'fa-cloud',
-                'security': 'fa-shield-halved',
-                'search': 'fa-magnifying-glass',
-                'help': 'fa-circle-question',
-                'important_devices': 'fa-tv',
-                'network_check': 'fa-wifi',
-                'description': 'fa-file-lines',
-                'fact_check': 'fa-square-check',
-                'insights': 'fa-lightbulb',
-                'integration_instructions': 'fa-terminal',
-                'memory': 'fa-microchip',
-                'pageview': 'fa-eye',
-                'storage': 'fa-database',
-                'supervisor_account': 'fa-user-tie',
-                'task': 'fa-list-check',
-                'api': 'fa-gears',
-                'cable': 'fa-plug',
-                'query_stats': 'fa-chart-area',
-                'devices': 'fa-mobile-screen',
-                'app_settings_alt': 'fa-screwdriver-wrench'
-            };
-            
-            return iconMap[materialIcon] || 'fa-grip'; // Default to 'fa-grip' if not found
-        }
-
         /* Initialize default tools */
         function initializeDefaultTools() {
             debug('Initializing default tools');
@@ -1143,9 +1042,9 @@
                 iconDiv.className = 'tool-icon';
                 iconDiv.style.backgroundColor = tool.color;
                 
-                // Update for Font Awesome icons
-                const icon = document.createElement('i');
-                icon.className = `fa-solid ${tool.icon}`;
+                const icon = document.createElement('span');
+                icon.className = 'material-icons';
+                icon.textContent = tool.icon;
                 iconDiv.appendChild(icon);
                 
                 const info = document.createElement('div');
@@ -1165,7 +1064,7 @@
                 
                 const editButton = document.createElement('div');
                 editButton.className = 'edit-button';
-                editButton.innerHTML = '<i class="fa-solid fa-pen" style="font-size: 16px;"></i>';
+                editButton.innerHTML = '<span class="material-icons" style="font-size: 16px;">edit</span>';
                 editButton.addEventListener('click', function(e) {
                     e.stopPropagation();
                     openEditPanel(tool.id);
@@ -1173,7 +1072,7 @@
                 
                 const dragHandle = document.createElement('div');
                 dragHandle.className = 'drag-handle';
-                dragHandle.innerHTML = '<i class="fa-solid fa-grip-lines"></i>';
+                dragHandle.innerHTML = '<span class="material-icons">drag_indicator</span>';
                 
                 info.appendChild(title);
                 info.appendChild(description);
@@ -1305,15 +1204,6 @@
                     } catch (e) {
                         debug('JSON parse error', e);
                         throw new Error(`Failed to parse JSON: ${e.message}`);
-                    }
-                    
-                    // Convert Material Design icons to Font Awesome if needed
-                    if (config.toolsData) {
-                        config.toolsData.forEach(tool => {
-                            if (tool.icon && !tool.icon.startsWith('fa-')) {
-                                tool.icon = convertToFontAwesomeIcon(tool.icon);
-                            }
-                        });
                     }
                     
                     return {
@@ -1468,7 +1358,7 @@
                     }
                 });
 
-                button.innerHTML = '<i class="fa-solid fa-vial"></i> Test Connection';
+                button.textContent = 'Test Connection';
                 button.disabled = false;
 
                 if (!response.ok) {
@@ -1542,7 +1432,7 @@
             const config = await fetchConfigFromGitHub();
             
             if (button) {
-                button.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Save Settings';
+                button.textContent = 'Save Settings';
                 button.disabled = false;
             }
             
@@ -1588,16 +1478,6 @@
                 }
                 
                 const config = await response.json();
-                
-                // Convert Material Design icons to Font Awesome if needed
-                if (config.toolsData) {
-                    config.toolsData.forEach(tool => {
-                        if (tool.icon && !tool.icon.startsWith('fa-')) {
-                            tool.icon = convertToFontAwesomeIcon(tool.icon);
-                        }
-                    });
-                }
-                
                 debug('Public config loaded successfully', { toolCount: config.toolsData.length });
                 return config;
             } catch (error) {
@@ -1614,7 +1494,7 @@
             document.querySelectorAll('.tool-card').forEach(card => {
                 card.classList.add('admin-mode');
             });
-            document.getElementById('adminToggle').innerHTML = '<i class="fa-solid fa-check"></i>';
+            document.getElementById('adminToggle').textContent = '✓';
             document.getElementById('adminToggle').style.backgroundColor = 'var(--emerald)';
             document.getElementById('adminToggle').style.color = 'white';
             document.getElementById('newToolBtn').style.display = 'flex';
@@ -1624,12 +1504,13 @@
         function exitAdminMode() {
             debug('Exiting admin mode');
             isAdminMode = false;
+            // Remove this line: clearAuthToken();
             document.body.classList.remove('admin-mode');
             document.querySelectorAll('.tool-card').forEach(card => {
                 card.classList.remove('admin-mode');
             });
             document.getElementById('adminPanel').style.display = 'none';
-            document.getElementById('adminToggle').innerHTML = '<i class="fa-solid fa-gear"></i>';
+            document.getElementById('adminToggle').textContent = '⚙️';
             document.getElementById('adminToggle').style.backgroundColor = 'white';
             document.getElementById('adminToggle').style.color = 'initial';
             document.getElementById('newToolBtn').style.display = 'none';
@@ -1645,58 +1526,13 @@
             }
         }
         
-        /* Create and populate the icon selector */
-        function setupIconSelector() {
-            const iconSelector = document.getElementById('iconSelector');
-            iconSelector.innerHTML = '';
-            
-            // Create category headers and add all icons
-            for (const [category, icons] of Object.entries(iconCategories)) {
-                const categoryHeader = document.createElement('div');
-                categoryHeader.style.gridColumn = '1 / -1';
-                categoryHeader.style.fontWeight = 'bold';
-                categoryHeader.style.marginTop = '10px';
-                categoryHeader.style.borderBottom = '1px solid #ddd';
-                categoryHeader.style.paddingBottom = '5px';
-                categoryHeader.textContent = category;
-                iconSelector.appendChild(categoryHeader);
-                
-                icons.forEach(icon => {
-                    const iconItem = document.createElement('div');
-                    iconItem.className = 'icon-selector-item';
-                    iconItem.setAttribute('data-icon', icon);
-                    
-                    const iconElement = document.createElement('i');
-                    iconElement.className = `fa-solid ${icon}`;
-                    iconItem.appendChild(iconElement);
-                    
-                    iconItem.addEventListener('click', function() {
-                        const iconInput = document.getElementById('toolIcon');
-                        iconInput.value = icon;
-                        
-                        // Update the preview
-                        const previewIcon = document.querySelector('.icon-preview i');
-                        previewIcon.className = `fa-solid ${icon}`;
-                        
-                        // Update selected state
-                        document.querySelectorAll('.icon-selector-item').forEach(item => {
-                            item.classList.remove('selected');
-                        });
-                        iconItem.classList.add('selected');
-                    });
-                    
-                    iconSelector.appendChild(iconItem);
-                }
-            }
-        }
-        
         function openEditPanel(toolId) {
             currentToolId = toolId;
             
             if (toolId === null) {
                 debug('Opening panel to add new tool');
                 document.getElementById('adminPanelTitle').textContent = 'Add New Tool';
-                document.getElementById('toolIcon').value = 'fa-grip';
+                document.getElementById('toolIcon').value = 'dashboard';
                 document.getElementById('toolTitle').value = '';
                 document.getElementById('toolDescription').value = '';
                 document.getElementById('toolLink').value = '';
@@ -1714,16 +1550,449 @@
                 setupColorPicker(tool.color);
             }
             
-            // Setup icon preview with Font Awesome
-            const previewIcon = document.querySelector('.icon-preview i');
-            previewIcon.className = `fa-solid ${document.getElementById('toolIcon').value}`;
-            
-            // Hide the icon selector initially
-            document.getElementById('iconSelector').style.display = 'none';
-            
-            // Show the panel
+            document.querySelector('.icon-preview .material-icons').textContent = document.getElementById('toolIcon').value;
             document.getElementById('adminPanel').style.display = 'block';
-            
-            // Setup the icon selector
-            setupIconSelector();
         }
+        
+        function setupColorPicker(selectedColor) {
+            debug('Setting up color picker', { selectedColor });
+            const colorPicker = document.getElementById('colorPicker');
+            colorPicker.innerHTML = '';
+            
+            const colorMap = {
+                'turquoise': 'var(--turquoise)',
+                'emerald': 'var(--emerald)',
+                'peter-river': 'var(--peter-river)',
+                'amethyst': 'var(--amethyst)',
+                'wet-asphalt': 'var(--wet-asphalt)',
+                'green-sea': 'var(--green-sea)',
+                'nephritis': 'var(--nephritis)',
+                'belize-hole': 'var(--belize-hole)',
+                'wisteria': 'var(--wisteria)',
+                'midnight-blue': 'var(--midnight-blue)',
+                'sunflower': 'var(--sunflower)',
+                'carrot': 'var(--carrot)',
+                'alizarin': 'var(--alizarin)',
+                'clouds': 'var(--clouds)',
+                'concrete': 'var(--concrete)',
+                'orange': 'var(--orange)',
+                'pumpkin': 'var(--pumpkin)',
+                'pomegranate': 'var(--pomegranate)',
+                'silver': 'var(--silver)',
+                'asbestos': 'var(--asbestos)'
+            };
+            
+            Object.entries(colorMap).forEach(([name, value]) => {
+                const swatch = document.createElement('div');
+                swatch.className = 'color-swatch';
+                swatch.setAttribute('data-color-value', value);
+                swatch.style.backgroundColor = value;
+                
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'color-swatch-name';
+                nameSpan.textContent = name.replace(/-/g, ' ');
+                swatch.appendChild(nameSpan);
+                
+                if (value === selectedColor) {
+                    swatch.classList.add('selected');
+                }
+                
+                swatch.addEventListener('click', function() {
+                    document.querySelectorAll('.color-swatch').forEach(s => {
+                        s.classList.remove('selected');
+                    });
+                    this.classList.add('selected');
+                });
+                
+                colorPicker.appendChild(swatch);
+            });
+        }
+        
+        /* Status message */
+        function showStatusMessage(message, type) {
+            debug('Showing status message', { message, type });
+            const statusElement = document.getElementById('statusMessage');
+            statusElement.textContent = message;
+            statusElement.className = 'status-message ' + type;
+            statusElement.classList.add('show');
+            
+            setTimeout(() => {
+                statusElement.classList.remove('show');
+            }, 5000); // Increased from 3000 to 5000 for more visibility
+        }
+        
+        /* Load settings from localStorage */
+        function loadSettings() {
+            debug('Loading settings');
+            try {
+                const username = localStorage.getItem('githubUsername') || 'adamismyusername';
+                const repo = localStorage.getItem('githubRepo') || 'sfdash';
+                const token = localStorage.getItem('githubToken') || '';
+                const branch = localStorage.getItem('githubBranch') || 'main';
+                
+                debug('Settings loaded from localStorage', { username, repo, branch, hasToken: !!token });
+                
+                githubSettings = { username, repo, token, branch };
+                document.getElementById('githubUsername').value = username;
+                document.getElementById('githubRepo').value = repo;
+                document.getElementById('githubToken').value = token;
+                document.getElementById('githubBranch').value = branch;
+                
+                const savedTools = localStorage.getItem('dashboardTools');
+                if (savedTools) {
+                    try {
+                        toolsData = JSON.parse(savedTools);
+                        debug('Tools loaded from localStorage', { toolCount: toolsData.length });
+                    } catch (e) {
+                        debug('Error parsing saved tools data', e);
+                        initializeDefaultTools();
+                    }
+                } else {
+                    debug('No saved tools in localStorage');
+                    initializeDefaultTools();
+                }
+            } catch (e) {
+                debug('localStorage not available', e);
+                githubSettings = { 
+                    username: 'adamismyusername', 
+                    repo: 'sfdash', 
+                    token: '', 
+                    branch: 'main' 
+                };
+                document.getElementById('githubUsername').value = githubSettings.username;
+                document.getElementById('githubRepo').value = githubSettings.repo;
+                document.getElementById('githubBranch').value = githubSettings.branch;
+                initializeDefaultTools();
+            }
+        }
+        
+        /* Try to infer GitHub settings from URL */
+        function tryInferGitHubSettings() {
+            debug('Trying to infer GitHub settings from URL');
+            try {
+                const url = new URL(window.location.href);
+                debug('Current URL', url.toString());
+                
+                const pathParts = url.pathname.split('/').filter(part => part);
+                debug('Path parts', pathParts);
+                
+                if (url.hostname.endsWith('github.io')) {
+                    const username = url.hostname.replace('.github.io', '');
+                    const repo = pathParts[0] || '';
+                    
+                    if (username && repo) {
+                        debug('Inferred GitHub settings', { username, repo });
+                        githubSettings.username = username;
+                        githubSettings.repo = repo;
+                        document.getElementById('githubUsername').value = username;
+                        document.getElementById('githubRepo').value = repo;
+                    } else {
+                        debug('Could not fully infer GitHub settings', { username, repo });
+                    }
+                }
+            } catch (e) {
+                debug('Error inferring GitHub settings from URL', e);
+            }
+        }
+
+        /* Event listeners setup */
+        function setupEventListeners() {
+            debug('Setting up event listeners');
+            
+            // Admin mode toggle
+            document.getElementById('adminToggle').addEventListener('click', function() {
+                if (isAdminMode) {
+                    exitAdminMode();
+                } else {
+                    document.getElementById('adminLoginPanel').style.display = 'block';
+                }
+            });
+            
+            // Debug panel toggle
+            document.getElementById('debugToggle').addEventListener('click', function() {
+                const panel = document.getElementById('debugPanel');
+                panel.classList.toggle('show');
+                if (panel.classList.contains('show')) {
+                    updateDebugPanel();
+                }
+            });
+            
+            // Cancel login
+            document.getElementById('cancelLogin').addEventListener('click', function() {
+                document.getElementById('adminLoginPanel').style.display = 'none';
+            });
+            
+            // Login as admin
+            document.getElementById('loginAdmin').addEventListener('click', function() {
+                const password = document.getElementById('adminPassword').value;
+                if (password === adminPassword) {
+                    document.getElementById('adminLoginPanel').style.display = 'none';
+                    
+                    // Save authentication token if "Remember Me" is checked
+                    const rememberMe = document.getElementById('rememberMe').checked;
+                    debug('Remember me checked:', rememberMe); // Add explicit debugging
+                    
+                    if (rememberMe) {
+                        const authToken = generateAuthToken();
+                        saveAuthToken(authToken);
+                        debug('User authenticated with "Remember Me"', authToken);
+                    }
+                    
+                    if (!githubSettings.token) {
+                        document.getElementById('githubTokenPanel').style.display = 'block';
+                    } else {
+                        enterAdminMode();
+                    }
+                    document.getElementById('adminPassword').value = '';
+                } else {
+                    showStatusMessage('Incorrect password', 'error');
+                }
+            });
+            
+            // New tool button
+            document.getElementById('newToolBtn').addEventListener('click', function() {
+                openEditPanel(null);
+            });
+            
+            // Close admin panel
+            document.getElementById('closeAdmin').addEventListener('click', function() {
+                document.getElementById('adminPanel').style.display = 'none';
+            });
+            
+            // Close GitHub panel
+            document.getElementById('closeGithubPanel').addEventListener('click', function() {
+                document.getElementById('githubTokenPanel').style.display = 'none';
+                if (githubSettings.token) {
+                    enterAdminMode();
+                }
+            });
+            
+            // Icon preview
+            document.getElementById('toolIcon').addEventListener('input', function() {
+                const previewIcon = document.querySelector('.icon-preview .material-icons');
+                previewIcon.textContent = this.value || 'dashboard';
+            });
+            
+            // Save tool changes
+            document.getElementById('saveToolChanges').addEventListener('click', async function() {
+                debug('Saving tool changes');
+                
+                const selectedSwatch = document.querySelector('.color-swatch.selected');
+                const selectedColor = selectedSwatch ? selectedSwatch.getAttribute('data-color-value') : 'var(--turquoise)';
+                
+                if (currentToolId === null) {
+                    // Add new tool
+                    const newId = toolsData.length > 0 ? Math.max(...toolsData.map(t => t.id)) + 1 : 1;
+                    const newTool = {
+                        id: newId,
+                        icon: document.getElementById('toolIcon').value,
+                        title: document.getElementById('toolTitle').value,
+                        description: document.getElementById('toolDescription').value,
+                        url: document.getElementById('toolLink').value,
+                        color: selectedColor
+                    };
+                    debug('Adding new tool', newTool);
+                    toolsData.push(newTool);
+                } else {
+                    // Update existing tool
+                    const toolIndex = toolsData.findIndex(t => t.id === currentToolId);
+                    if (toolIndex !== -1) {
+                        debug('Updating existing tool', { id: currentToolId });
+                        toolsData[toolIndex].icon = document.getElementById('toolIcon').value;
+                        toolsData[toolIndex].title = document.getElementById('toolTitle').value;
+                        toolsData[toolIndex].description = document.getElementById('toolDescription').value;
+                        toolsData[toolIndex].url = document.getElementById('toolLink').value;
+                        toolsData[toolIndex].color = selectedColor;
+                    }
+                }
+                
+                renderDashboard();
+                
+                if (githubSettings.token) {
+                    const button = document.getElementById('saveToolChanges');
+                    const originalText = button.textContent;
+                    button.innerHTML = '<span class="loading-spinner"></span>Saving...';
+                    button.disabled = true;
+
+                    await saveConfigToGitHub();
+
+                    button.textContent = originalText;
+                    button.disabled = false;
+                } else {
+                    try {
+                        localStorage.setItem('dashboardTools', JSON.stringify(toolsData));
+                        debug('Saved tools to localStorage');
+                    } catch (e) {
+                        debug('localStorage not available for saving tools', e);
+                    }
+                }
+                
+                document.getElementById('adminPanel').style.display = 'none';
+            });
+            
+            // Delete tool
+            document.getElementById('deleteTool').addEventListener('click', async function() {
+if (currentToolId && confirm('Are you sure you want to delete this tool?')) {
+                    debug('Deleting tool', { id: currentToolId });
+                    toolsData = toolsData.filter(t => t.id !== currentToolId);
+                    renderDashboard();
+                    
+                    if (githubSettings.token) {
+                        const button = document.getElementById('deleteTool');
+                        const originalText = button.textContent;
+                        button.innerHTML = '<span class="loading-spinner"></span>Deleting...';
+                        button.disabled = true;
+                        
+                        await saveConfigToGitHub();
+                        
+                        button.textContent = originalText;
+                        button.disabled = false;
+                    } else {
+                        try {
+                            localStorage.setItem('dashboardTools', JSON.stringify(toolsData));
+                        } catch (e) {
+                            debug('localStorage not available for saving after delete', e);
+                        }
+                    }
+                    
+                    document.getElementById('adminPanel').style.display = 'none';
+                }
+            });
+            
+            // Save order button
+            document.getElementById('saveOrderBtn').addEventListener('click', async function() {
+                debug('Saving tool order');
+                const button = document.getElementById('saveOrderBtn');
+                button.classList.add('saving');
+                button.innerHTML = '<span class="loading-spinner"></span>Saving...';
+                
+                await saveConfigToGitHub();
+                
+                button.classList.remove('saving');
+                button.innerHTML = '<span class="material-icons">save</span>Save Order';
+            });
+            
+            // Test GitHub connection
+            document.getElementById('testGithubConnection').addEventListener('click', function() {
+                testGitHubConnection();
+            });
+            
+            // Save GitHub settings
+            document.getElementById('saveGithubSettings').addEventListener('click', function() {
+                saveGitHubSettings();
+            });
+            
+            // Enter key in password field
+            document.getElementById('adminPassword').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    document.getElementById('loginAdmin').click();
+                }
+            });
+            
+            // Enter key in token field
+            document.getElementById('githubToken').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    document.getElementById('saveGithubSettings').click();
+                }
+            });
+        }
+
+        /* Initialize everything */
+        window.addEventListener('DOMContentLoaded', async function() {
+            debug('DOM content loaded, initializing application');
+            
+            // Set default GitHub settings
+            githubSettings = {
+                username: 'adamismyusername',
+                repo: 'sfdash',
+                token: '',
+                branch: 'main'
+            };
+            
+            document.getElementById('githubUsername').value = githubSettings.username;
+            document.getElementById('githubRepo').value = githubSettings.repo;
+            document.getElementById('githubBranch').value = githubSettings.branch;
+            
+            // Try to load token from localStorage
+            try {
+                const token = localStorage.getItem('githubToken');
+                if (token) {
+                    debug('Token loaded from localStorage');
+                    githubSettings.token = token;
+                    document.getElementById('githubToken').value = token;
+                }
+            } catch (e) {
+                debug('localStorage not available for token', e);
+            }
+            
+            // Setup event listeners
+            setupEventListeners();
+            
+            // Initialize default tools
+            initializeDefaultTools();
+            
+            // Try to load config from GitHub
+            let config = null;
+            
+            if (githubSettings.token) {
+                debug('Loading config using token');
+                try {
+                    config = await fetchConfigFromGitHub();
+                } catch (e) {
+                    debug('Error loading config with token', e);
+                }
+            }
+            
+            if (!config) {
+                debug('Loading public config');
+                try {
+                    config = await loadPublicConfigFromGitHub();
+                } catch (e) {
+                    debug('Error loading public config', e);
+                }
+            }
+            
+            if (config && config.toolsData) {
+                debug('Config loaded', { toolCount: config.toolsData.length });
+                toolsData = config.toolsData;
+                try {
+                    localStorage.setItem('dashboardTools', JSON.stringify(toolsData));
+                } catch (e) {
+                    debug('Could not save loaded tools to localStorage', e);
+                }
+            }
+            
+            // Check for saved authentication token
+            const hasValidToken = checkAuthToken();
+            debug('Auto-login check result:', hasValidToken);
+            if (hasValidToken) {
+                debug('Auto-login with saved token');
+                if (githubSettings.token) {
+                    debug('Token exists, entering admin mode directly');
+                    enterAdminMode();
+                } else {
+                    debug('No GitHub token, showing GitHub panel');
+                    document.getElementById('githubTokenPanel').style.display = 'block';
+                }
+            } 
+            
+            // Render the dashboard
+            renderDashboard();
+            
+            debug('Initialization complete');
+        });
+
+        /* Iframe resizing support */
+        function resizeForIframe() {
+            if (window.self !== window.top) {
+                const height = document.body.scrollHeight;
+                window.parent.postMessage({ type: 'resize', height }, '*');
+            }
+        }
+
+        window.addEventListener('resize', resizeForIframe);
+        window.addEventListener('load', resizeForIframe);
+        setInterval(resizeForIframe, 500);
+    </script>
+</body>
+</html>
