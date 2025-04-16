@@ -41,14 +41,6 @@
       "color": "var(--midnight-blue)"
     },
     {
-      "id": 35,
-      "icon": "devices",
-      "title": "Tool 35",
-      "description": "This is a description for Tool 35. It explains what this tool does and how to use it.",
-      "url": "#",
-      "color": "var(--concrete)"
-    },
-    {
       "id": 33,
       "icon": "cable",
       "title": "Tool 33",
