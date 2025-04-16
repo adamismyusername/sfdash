@@ -3,7 +3,7 @@
     {
       "id": 22,
       "icon": "view_timeline",
-      "title": "Monday | Project Manager",
+      "title": "Monday.com",
       "description": "Project Manager for Goldco",
       "url": "https://goldco-force.monday.com/",
       "color": "var(--wisteria)"
@@ -11,9 +11,9 @@
     {
       "id": 5,
       "icon": "info",
-      "title": "Tool 5",
-      "description": "This is a description for Tool 5. It explains what this tool does and how to use it.",
-      "url": "#",
+      "title": "Salesforce",
+      "description": "Goldco's main CRM for leads, campaigns, and sales",
+      "url": "https://goldco.my.salesforce.com/home/home.jsp",
       "color": "var(--emerald)"
     },
     {
