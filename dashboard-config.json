@@ -10,7 +10,7 @@
     },
     {
       "id": 5,
-      "icon": "info",
+      "icon": "attach_money",
       "title": "Salesforce",
       "description": "Goldco's main CRM for leads, campaigns, and sales",
       "url": "https://goldco.my.salesforce.com/home/home.jsp",
@@ -19,18 +19,18 @@
     {
       "id": 8,
       "icon": "bar_chart",
-      "title": "Color Test",
-      "description": "Testing the color selection",
-      "url": "#",
-      "color": "var(--alizarin)"
+      "title": "Unbounce",
+      "description": "This is where most of Goldco's landing pages are hosted",
+      "url": "https://app.unbounce.com/5598866/pages",
+      "color": "var(--belize-hole)"
     },
     {
       "id": 16,
       "icon": "folder",
-      "title": "Tool 16",
-      "description": "This is a description for Tool 16. It explains what this tool does and how to use it.",
-      "url": "#",
-      "color": "var(--clouds)"
+      "title": "Creatopy",
+      "description": "An app that can quickly create multiple sizes, layouts and versions of banner ads",
+      "url": "https://auth.creatopy.com/auth/realms/creatopy/protocol/openid-connect/auth",
+      "color": "var(--belize-hole)"
     },
     {
       "id": 15,
@@ -41,22 +41,6 @@
       "color": "var(--midnight-blue)"
     },
     {
-      "id": 33,
-      "icon": "cable",
-      "title": "Tool 33",
-      "description": "This is a description for Tool 33. It explains what this tool does and how to use it.",
-      "url": "#",
-      "color": "var(--alizarin)"
-    },
-    {
-      "id": 29,
-      "icon": "storage",
-      "title": "asdfasdfas",
-      "description": "asdfasdf",
-      "url": "#",
-      "color": "var(--emerald)"
-    },
-    {
       "id": 14,
       "icon": "add_to_drive",
       "title": "Google Drive",
@@ -65,12 +49,52 @@
       "color": "var(--peter-river)"
     },
     {
+      "id": 2,
+      "icon": "html",
+      "title": "Creative Generator (v1)",
+      "description": "Automatically generate creatives with proper tracking links",
+      "url": "https://generator.goldcocreatives.com/generate",
+      "color": "var(--turquoise)"
+    },
+    {
+      "id": 1,
+      "icon": "html",
+      "title": "Creative Generator (4 in 1)",
+      "description": "Updates all links in the the 4 in 1 creative with values entered into the form fields. ",
+      "url": "https://adamismyusername.github.io/4in1/",
+      "color": "var(--turquoise)"
+    },
+    {
+      "id": 26,
+      "icon": "integration_instructions",
+      "title": "Google | Sheets",
+      "description": "",
+      "url": "https://docs.google.com/spreadsheets/u/0/?tgif=c",
+      "color": "var(--nephritis)"
+    },
+    {
+      "id": 33,
+      "icon": "hourglass_bottom",
+      "title": "Coming Soon",
+      "description": "Coming soon",
+      "url": "#",
+      "color": "var(--clouds)"
+    },
+    {
+      "id": 29,
+      "icon": "hourglass_bottom",
+      "title": "Coming Soon",
+      "description": "Coming soon",
+      "url": "#",
+      "color": "var(--clouds)"
+    },
+    {
       "id": 21,
       "icon": "important_devices",
-      "title": "Tool 21",
-      "description": "This is a description for Tool 21. It explains what this tool does and how to use it.",
-      "url": "#",
-      "color": "var(--turquoise)"
+      "title": "Competitors",
+      "description": "A list of competitors, their websites, landing pages and more. *Access requires management approval.",
+      "url": "https://docs.google.com/spreadsheets/d/1if2q4XmGK-f0e1qPWlyOa1vBty-f0s3fCCrqTQhpacg/edit?gid=0#gid=0",
+      "color": "var(--silver)"
     },
     {
       "id": 17,
@@ -87,14 +111,6 @@
       "description": "This is a description for Tool 24. It explains what this tool does and how to use it.",
       "url": "#",
       "color": "var(--amethyst)"
-    },
-    {
-      "id": 26,
-      "icon": "integration_instructions",
-      "title": "Google | Sheets",
-      "description": "",
-      "url": "https://docs.google.com/spreadsheets/u/0/?tgif=c",
-      "color": "var(--nephritis)"
     },
     {
       "id": 32,
@@ -135,118 +151,6 @@
       "description": "This is a description for Tool 34. It explains what this tool does and how to use it.",
       "url": "#",
       "color": "var(--clouds)"
-    },
-    {
-      "id": 3,
-      "icon": "build",
-      "title": "Drag/Drop Test",
-      "description": "This is a test of drag and drop",
-      "url": "#",
-      "color": "var(--peter-river)"
-    },
-    {
-      "id": 1,
-      "icon": "html",
-      "title": "Creative Generator (4 in 1)",
-      "description": "Updates all links in the the 4 in 1 creative with values entered into the form fields. ",
-      "url": "https://adamismyusername.github.io/4in1/",
-      "color": "var(--turquoise)"
-    },
-    {
-      "id": 2,
-      "icon": "html",
-      "title": "Creative Generator (v1)",
-      "description": "Automatically generate creatives with proper tracking links",
-      "url": "https://generator.goldcocreatives.com/generate",
-      "color": "var(--turquoise)"
-    },
-    {
-      "id": 13,
-      "icon": "chat",
-      "title": "Tool 13",
-      "description": "This is a description for Tool 13. It explains what this tool does and how to use it.",
-      "url": "#",
-      "color": "var(--peter-river)"
-    },
-    {
-      "id": 30,
-      "icon": "supervisor_account",
-      "title": "Tool 30",
-      "description": "This is a description for Tool 30. It explains what this tool does and how to use it.",
-      "url": "#",
-      "color": "var(--midnight-blue)"
-    },
-    {
-      "id": 20,
-      "icon": "help",
-      "title": "Tool 20",
-      "description": "This is a description for Tool 20. It explains what this tool does and how to use it.",
-      "url": "#",
-      "color": "var(--asbestos)"
-    },
-    {
-      "id": 11,
-      "icon": "notifications",
-      "title": "Tool 11",
-      "description": "This is a description for Tool 11. It explains what this tool does and how to use it.",
-      "url": "#",
-      "color": "var(--alizarin)"
-    },
-    {
-      "id": 23,
-      "icon": "description",
-      "title": "Tool 23",
-      "description": "This is a description for Tool 23. It explains what this tool does and how to use it.",
-      "url": "#",
-      "color": "var(--peter-river)"
-    },
-    {
-      "id": 12,
-      "icon": "mail",
-      "title": "Tool 12",
-      "description": "This is a description for Tool 12. It explains what this tool does and how to use it.",
-      "url": "#",
-      "color": "var(--peter-river)"
-    },
-    {
-      "id": 27,
-      "icon": "memory",
-      "title": "Tool 27",
-      "description": "This is a description for Tool 27. It explains what this tool does and how to use it.",
-      "url": "#",
-      "color": "var(--nephritis)"
-    },
-    {
-      "id": 25,
-      "icon": "insights",
-      "title": "Tool 25",
-      "description": "This is a description for Tool 25. It explains what this tool does and how to use it.",
-      "url": "#",
-      "color": "var(--wet-asphalt)"
-    },
-    {
-      "id": 28,
-      "icon": "pageview",
-      "title": "Tool 28",
-      "description": "This is a description for Tool 28. It explains what this tool does and how to use it.",
-      "url": "#",
-      "color": "var(--belize-hole)"
-    },
-    {
-      "id": 19,
-      "icon": "search",
-      "title": "Tool 19",
-      "description": "This is a description for Tool 19. It explains what this tool does and how to use it.",
-      "url": "#",
-      "color": "var(--asbestos)"
-    },
-    {
-      "id": 36,
-      "icon": "app_settings_alt",
-      "title": "Tool 36",
-      "description": "This is a description for Tool 36. It explains what this tool does and how to use it.",
-      "url": "#",
-      "color": "var(--orange)"
     }
   ]
 }
