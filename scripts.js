@@ -98,6 +98,18 @@ function updateDebugPanel() {
         
         panel.appendChild(logLine);
     });
+
+/* Iframe resizing support */
+function resizeForIframe() {
+    if (window.self !== window.top) {
+        const height = document.body.scrollHeight;
+        window.parent.postMessage({ type: 'resize', height }, '*');
+    }
+}
+
+window.addEventListener('resize', resizeForIframe);
+window.addEventListener('load', resizeForIframe);
+setInterval(resizeForIframe, 500);
     
     // Auto-scroll to bottom
     panel.scrollTop = panel.scrollHeight;
@@ -109,6 +121,7 @@ let orderChanged = false;
 let isAdminMode = false;
 const adminPassword = "admin123";
 let currentToolId = null;
+let changesNeedSaving = false;
 
 /* Authentication token management */
 function generateAuthToken() {
@@ -324,7 +337,16 @@ function initDragAndDrop() {
         onEnd: function(evt) {
             updateToolsDataOrder();
             orderChanged = true;
+            changesNeedSaving = true;
             document.getElementById('saveOrderBtn').classList.add('show');
+            
+            // Show a save indicator in the admin toggle
+            const adminToggle = document.getElementById('adminToggle');
+            if (!adminToggle.classList.contains('has-changes')) {
+                adminToggle.classList.add('has-changes');
+                adminToggle.setAttribute('data-original-text', adminToggle.textContent);
+                adminToggle.textContent = '✓*'; // Asterisk indicates unsaved changes
+            }
         }
     });
 }
@@ -427,6 +449,10 @@ async function saveConfigToGitHub() {
         showStatusMessage('GitHub settings not configured', 'error');
         return false;
     }
+    
+    // Reset change flags
+    changesNeedSaving = false;
+    orderChanged = false;
 
     try {
         // Prepare the content
@@ -716,8 +742,24 @@ function exitAdminMode() {
         sortableInstance = null;
     }
     
-    if (orderChanged) {
-        saveConfigToGitHub();
+    // Save changes to GitHub when exiting admin mode if there are any pending changes
+    const adminToggle = document.getElementById('adminToggle');
+    const hasChanges = adminToggle.classList.contains('has-changes') || orderChanged;
+    
+    if (hasChanges && githubSettings.token) {
+        // Show saving status
+        showStatusMessage('Saving all changes to GitHub...', 'success');
+        
+        // Save to GitHub
+        saveConfigToGitHub().then(() => {
+            // Reset changes flags
+            orderChanged = false;
+            adminToggle.classList.remove('has-changes');
+            showStatusMessage('All changes saved to GitHub successfully', 'success');
+        }).catch(error => {
+            debug('Error saving to GitHub on exit', error);
+            showStatusMessage('Error saving changes to GitHub. Your changes are saved locally.', 'error');
+        });
     }
 }
 
@@ -963,4 +1005,158 @@ function setupEventListeners() {
     });
     
     // Icon preview
-    document.getElementById('toolIcon').addEventListener('input',
+    document.getElementById('toolIcon').addEventListener('input', function() {
+        const previewIcon = document.querySelector('.icon-preview .material-icons');
+        previewIcon.textContent = this.value || 'dashboard';
+    });
+    
+    // Use the global changesNeedSaving variable
+    
+    // Save tool changes
+    document.getElementById('saveToolChanges').addEventListener('click', function() {
+        debug('Saving tool changes');
+        
+        const selectedSwatch = document.querySelector('.color-swatch.selected');
+        const selectedColor = selectedSwatch ? selectedSwatch.getAttribute('data-color-value') : 'var(--turquoise)';
+        
+        if (currentToolId === null) {
+            // Add new tool
+            const newId = toolsData.length > 0 ? Math.max(...toolsData.map(t => t.id)) + 1 : 1;
+            const newTool = {
+                id: newId,
+                icon: document.getElementById('toolIcon').value,
+                title: document.getElementById('toolTitle').value,
+                description: document.getElementById('toolDescription').value,
+                url: document.getElementById('toolLink').value,
+                color: selectedColor
+            };
+            debug('Adding new tool', newTool);
+            toolsData.push(newTool);
+            changesNeedSaving = true;
+        } else {
+            // Update existing tool
+            const toolIndex = toolsData.findIndex(t => t.id === currentToolId);
+            if (toolIndex !== -1) {
+                debug('Updating existing tool', { id: currentToolId });
+                toolsData[toolIndex].icon = document.getElementById('toolIcon').value;
+                toolsData[toolIndex].title = document.getElementById('toolTitle').value;
+                toolsData[toolIndex].description = document.getElementById('toolDescription').value;
+                toolsData[toolIndex].url = document.getElementById('toolLink').value;
+                toolsData[toolIndex].color = selectedColor;
+                changesNeedSaving = true;
+            }
+        }
+        
+        renderDashboard();
+        
+        // Save to localStorage for immediate persistence
+        try {
+            localStorage.setItem('dashboardTools', JSON.stringify(toolsData));
+            debug('Saved tools to localStorage');
+        } catch (e) {
+            debug('localStorage not available for saving tools', e);
+        }
+        
+        // Show a save indicator in the admin toggle
+        if (changesNeedSaving) {
+            const adminToggle = document.getElementById('adminToggle');
+            if (!adminToggle.classList.contains('has-changes')) {
+                adminToggle.classList.add('has-changes');
+                adminToggle.setAttribute('data-original-text', adminToggle.textContent);
+                adminToggle.textContent = '✓*'; // Asterisk indicates unsaved changes
+            }
+        }
+        
+        document.getElementById('adminPanel').style.display = 'none';
+    });
+    
+    // Delete tool
+    document.getElementById('deleteTool').addEventListener('click', function() {
+        if (currentToolId && confirm('Are you sure you want to delete this tool?')) {
+            debug('Deleting tool', { id: currentToolId });
+            toolsData = toolsData.filter(t => t.id !== currentToolId);
+            renderDashboard();
+            changesNeedSaving = true;
+            
+            // Save to localStorage for immediate persistence
+            try {
+                localStorage.setItem('dashboardTools', JSON.stringify(toolsData));
+                debug('Saved tools to localStorage after delete');
+            } catch (e) {
+                debug('localStorage not available for saving after delete', e);
+            }
+            
+            // Show a save indicator in the admin toggle
+            const adminToggle = document.getElementById('adminToggle');
+            if (!adminToggle.classList.contains('has-changes')) {
+                adminToggle.classList.add('has-changes');
+                adminToggle.setAttribute('data-original-text', adminToggle.textContent);
+                adminToggle.textContent = '✓*'; // Asterisk indicates unsaved changes
+            }
+            
+            document.getElementById('adminPanel').style.display = 'none';
+        }
+    });
+    
+    // Save order button - instead of saving to GitHub immediately, just flag that there are changes
+    document.getElementById('saveOrderBtn').addEventListener('click', function() {
+        debug('Order saved locally');
+        const button = document.getElementById('saveOrderBtn');
+        button.classList.add('saving');
+        button.innerHTML = '<span class="loading-spinner"></span>Saving...';
+        
+        // Just save to localStorage and mark changes as needed
+        changesNeedSaving = true;
+        
+        try {
+            localStorage.setItem('dashboardTools', JSON.stringify(toolsData));
+            debug('Saved tool order to localStorage');
+        } catch (e) {
+            debug('localStorage not available for saving order', e);
+        }
+        
+        // Show a save indicator in the admin toggle
+        const adminToggle = document.getElementById('adminToggle');
+        if (!adminToggle.classList.contains('has-changes')) {
+            adminToggle.classList.add('has-changes');
+            adminToggle.setAttribute('data-original-text', adminToggle.textContent);
+            adminToggle.textContent = '✓*'; // Asterisk indicates unsaved changes
+        }
+        
+        // Update button to show saved locally
+        setTimeout(() => {
+            button.classList.remove('saving');
+            button.innerHTML = '<span class="material-icons">check</span>Order Saved';
+            
+            // Reset button after a delay
+            setTimeout(() => {
+                button.innerHTML = '<span class="material-icons">save</span>Save Order';
+                button.classList.remove('show');
+            }, 2000);
+        }, 800);
+    });
+    
+    // Test GitHub connection
+    document.getElementById('testGithubConnection').addEventListener('click', function() {
+        testGitHubConnection();
+    });
+    
+    // Save GitHub settings
+    document.getElementById('saveGithubSettings').addEventListener('click', function() {
+        saveGitHubSettings();
+    });
+    
+    // Enter key in password field
+    document.getElementById('adminPassword').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            document.getElementById('loginAdmin').click();
+        }
+    });
+    
+    // Enter key in token field
+    document.getElementById('githubToken').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            document.getElementById('saveGithubSettings').click();
+        }
+    });
+}
