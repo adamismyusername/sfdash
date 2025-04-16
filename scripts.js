@@ -27,6 +27,22 @@ const toolIcons = [
     'task', 'api', 'cable', 'query_stats', 'devices', 'app_settings_alt'
 ];
 
+/* Global variables */
+let sortableInstance = null;
+let orderChanged = false;
+let isAdminMode = false;
+const adminPassword = "admin123";
+let currentToolId = null;
+let changesNeedSaving = false;
+
+/* Iframe resizing support */
+function resizeForIframe() {
+    if (window.self !== window.top) {
+        const height = document.body.scrollHeight;
+        window.parent.postMessage({ type: 'resize', height }, '*');
+    }
+}
+
 /* Debug logging */
 const debugLog = [];
 function debug(message, data = null) {
@@ -98,30 +114,10 @@ function updateDebugPanel() {
         
         panel.appendChild(logLine);
     });
-
-/* Iframe resizing support */
-function resizeForIframe() {
-    if (window.self !== window.top) {
-        const height = document.body.scrollHeight;
-        window.parent.postMessage({ type: 'resize', height }, '*');
-    }
-}
-
-window.addEventListener('resize', resizeForIframe);
-window.addEventListener('load', resizeForIframe);
-setInterval(resizeForIframe, 500);
     
     // Auto-scroll to bottom
     panel.scrollTop = panel.scrollHeight;
 }
-
-/* Global variables */
-let sortableInstance = null;
-let orderChanged = false;
-let isAdminMode = false;
-const adminPassword = "admin123";
-let currentToolId = null;
-let changesNeedSaving = false;
 
 /* Authentication token management */
 function generateAuthToken() {
@@ -219,20 +215,7 @@ function renderDashboard() {
     dashboard.innerHTML = '';
     
     // Create a temporary array for reordering
-    const reorderedTools = [];
-    // Calculate how many tools per row (currently 4 in desktop view)
-    const itemsPerRow = 4;
-    const rows = Math.ceil(toolsData.length / itemsPerRow);
-    
-    // Fill the reordered array
-    for (let i = 0; i < itemsPerRow; i++) { // Column first
-        for (let j = 0; j < rows; j++) { // Then row
-            const index = j * itemsPerRow + i;
-            if (index < toolsData.length) {
-                reorderedTools.push(toolsData[index]);
-            }
-        }
-    }
+    const reorderedTools = toolsData.slice(); // Create a copy to work with
     
     // Now use reorderedTools instead of toolsData for rendering
     reorderedTools.forEach((tool) => {
@@ -1010,8 +993,6 @@ function setupEventListeners() {
         previewIcon.textContent = this.value || 'dashboard';
     });
     
-    // Use the global changesNeedSaving variable
-    
     // Save tool changes
     document.getElementById('saveToolChanges').addEventListener('click', function() {
         debug('Saving tool changes');
@@ -1160,3 +1141,98 @@ function setupEventListeners() {
         }
     });
 }
+
+/* Initialize everything */
+window.addEventListener('DOMContentLoaded', async function() {
+    debug('DOM content loaded, initializing application');
+    
+    // Set default GitHub settings
+    githubSettings = {
+        username: 'adamismyusername',
+        repo: 'sfdash',
+        token: '',
+        branch: 'main'
+    };
+    
+    document.getElementById('githubUsername').value = githubSettings.username;
+    document.getElementById('githubRepo').value = githubSettings.repo;
+    document.getElementById('githubBranch').value = githubSettings.branch;
+    
+    // Try to load token from localStorage
+    try {
+        const token = localStorage.getItem('githubToken');
+        if (token) {
+            debug('Token loaded from localStorage');
+            githubSettings.token = token;
+            document.getElementById('githubToken').value = token;
+        }
+    } catch (e) {
+        debug('localStorage not available for token', e);
+    }
+    
+    // Setup event listeners
+    setupEventListeners();
+    
+    // Initialize default tools
+    initializeDefaultTools();
+    
+    // Try to load config from GitHub
+    let config = null;
+    
+    try {
+        if (githubSettings.token) {
+            debug('Loading config using token');
+            try {
+                config = await fetchConfigFromGitHub();
+            } catch (e) {
+                debug('Error loading config with token', e);
+            }
+        }
+        
+        if (!config) {
+            debug('Loading public config');
+            try {
+                config = await loadPublicConfigFromGitHub();
+            } catch (e) {
+                debug('Error loading public config', e);
+            }
+        }
+        
+        if (config && config.toolsData) {
+            debug('Config loaded', { toolCount: config.toolsData.length });
+            toolsData = config.toolsData;
+            try {
+                localStorage.setItem('dashboardTools', JSON.stringify(toolsData));
+            } catch (e) {
+                debug('Could not save loaded tools to localStorage', e);
+            }
+        }
+    } catch (e) {
+        debug('Error during configuration loading', e);
+        // If loading from GitHub fails, try loading from localStorage
+        loadSettings();
+    }
+    
+    // Check for saved authentication token
+    const hasValidToken = checkAuthToken();
+    debug('Auto-login check result:', hasValidToken);
+    if (hasValidToken) {
+        debug('Auto-login with saved token');
+        if (githubSettings.token) {
+            debug('Token exists, entering admin mode directly');
+            enterAdminMode();
+        } else {
+            debug('No GitHub token, showing GitHub panel');
+            document.getElementById('githubTokenPanel').style.display = 'block';
+        }
+    } 
+    
+    // Render the dashboard
+    renderDashboard();
+    
+    debug('Initialization complete');
+});
+
+window.addEventListener('resize', resizeForIframe);
+window.addEventListener('load', resizeForIframe);
+setInterval(resizeForIframe, 500);
