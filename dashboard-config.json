@@ -151,6 +151,14 @@
       "description": "This is a description for Tool 34. It explains what this tool does and how to use it.",
       "url": "#",
       "color": "var(--clouds)"
+    },
+    {
+      "id": 35,
+      "icon": "dashboard",
+      "title": "Coming Soon",
+      "description": "New Tool Test",
+      "url": "#",
+      "color": "var(--clouds)"
     }
   ]
 }
