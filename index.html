@@ -12,21 +12,36 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Marketing Tools Dashboard</h1>
+    <!-- New toolbar -->
+    <div class="toolbar">
+        <h1>Marketing Tools Dashboard</h1>
+        <div class="toolbar-actions">
+            <!-- Login link (shown when not logged in) -->
+            <a href="#" id="adminLoginLink" class="admin-login-link">Admin Login</a>
+            
+            <!-- Admin buttons (hidden until logged in) -->
+            <div id="adminControls" class="admin-controls" style="display: none;">
+                <button id="newToolBtn" class="admin-btn">
+                    <span class="material-icons">add</span>
+                    New Tool
+                </button>
+                <button id="saveAllChangesBtn" class="admin-btn primary">
+                    <span class="material-icons">save</span>
+                    Save All Changes
+                </button>
+                <button id="logoutBtn" class="admin-btn secondary">
+                    <span class="material-icons">logout</span>
+                    Logout
+                </button>
+            </div>
+        </div>
+    </div>
     
-    <div class="dashboard" id="dashboard">
-        <!-- Tool cards will be added here dynamically -->
+    <div class="dashboard-container">
+        <div class="dashboard" id="dashboard">
+            <!-- Tool cards will be added here dynamically -->
+        </div>
     </div>
-
-    <div id="newToolBtn" class="save-order-btn" style="left: 100px; background-color: var(--peter-river); display: none;">
-        <span class="material-icons">add</span>
-        New Tool
-    </div>
-
-    <button id="saveOrderBtn" class="save-order-btn">
-        <span class="material-icons">save</span>
-        Save Order
-    </button>
 
     <div id="adminPanel" class="admin-panel" style="display: none;">
         <div class="admin-header">
@@ -129,7 +144,6 @@
         </div>
     </div>
 
-    <div id="adminToggle" class="admin-toggle" title="Admin Mode (Click to exit and save changes)">⚙️</div>
     <div id="debugToggle" class="debug-toggle" title="Debug Panel">🐞</div>
     <div id="debugPanel" class="debug-panel"></div>
 
