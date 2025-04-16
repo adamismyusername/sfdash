@@ -321,15 +321,9 @@ function initDragAndDrop() {
             updateToolsDataOrder();
             orderChanged = true;
             changesNeedSaving = true;
-            document.getElementById('saveOrderBtn').classList.add('show');
             
-            // Show a save indicator in the admin toggle
-            const adminToggle = document.getElementById('adminToggle');
-            if (!adminToggle.classList.contains('has-changes')) {
-                adminToggle.classList.add('has-changes');
-                adminToggle.setAttribute('data-original-text', adminToggle.textContent);
-                adminToggle.textContent = '✓*'; // Asterisk indicates unsaved changes
-            }
+            // Update the Save Changes button to show changes need saving
+            updateSaveChangesButton();
         }
     });
 }
@@ -350,6 +344,20 @@ function updateToolsDataOrder() {
     });
     
     toolsData = newToolsData;
+}
+
+/* Update the Save Changes button to show changes need saving */
+function updateSaveChangesButton() {
+    const saveBtn = document.getElementById('saveAllChangesBtn');
+    if (changesNeedSaving || orderChanged) {
+        if (!saveBtn.classList.contains('has-changes')) {
+            saveBtn.classList.add('has-changes');
+            saveBtn.innerHTML = '<span class="material-icons">save</span>Save Changes*';
+        }
+    } else {
+        saveBtn.classList.remove('has-changes');
+        saveBtn.innerHTML = '<span class="material-icons">save</span>Save All Changes';
+    }
 }
 
 /* GitHub API - Fetch configuration */
@@ -524,8 +532,10 @@ async function saveConfigToGitHub() {
         debug('GitHub save successful', { commit: responseData.commit });
         
         showStatusMessage('Configuration saved to GitHub successfully', 'success');
-        orderChanged = false;
-        document.getElementById('saveOrderBtn').classList.remove('show');
+        
+        // Update the save button to show no changes pending
+        updateSaveChangesButton();
+        
         return true;
     } catch (error) {
         debug('Error saving config to GitHub', error);
@@ -699,50 +709,49 @@ function enterAdminMode() {
     document.querySelectorAll('.tool-card').forEach(card => {
         card.classList.add('admin-mode');
     });
-    document.getElementById('adminToggle').textContent = '✓';
-    document.getElementById('adminToggle').style.backgroundColor = 'var(--emerald)';
-    document.getElementById('adminToggle').style.color = 'white';
-    document.getElementById('newToolBtn').style.display = 'flex';
+    
+    // Show admin controls in the toolbar
+    document.getElementById('adminLoginLink').style.display = 'none';
+    document.getElementById('adminControls').style.display = 'flex';
+    
     initDragAndDrop();
 }
 
 function exitAdminMode() {
     debug('Exiting admin mode');
-    isAdminMode = false;
-    document.body.classList.remove('admin-mode');
-    document.querySelectorAll('.tool-card').forEach(card => {
-        card.classList.remove('admin-mode');
-    });
-    document.getElementById('adminPanel').style.display = 'none';
-    document.getElementById('adminToggle').textContent = '⚙️';
-    document.getElementById('adminToggle').style.backgroundColor = 'white';
-    document.getElementById('adminToggle').style.color = 'initial';
-    document.getElementById('newToolBtn').style.display = 'none';
-    document.getElementById('saveOrderBtn').classList.remove('show');
-    
-    if (sortableInstance) {
-        sortableInstance.destroy();
-        sortableInstance = null;
-    }
     
     // Save changes to GitHub when exiting admin mode if there are any pending changes
-    const adminToggle = document.getElementById('adminToggle');
-    const hasChanges = adminToggle.classList.contains('has-changes') || orderChanged;
-    
-    if (hasChanges && githubSettings.token) {
+    if ((changesNeedSaving || orderChanged) && githubSettings.token) {
         // Show saving status
         showStatusMessage('Saving all changes to GitHub...', 'success');
         
         // Save to GitHub
         saveConfigToGitHub().then(() => {
             // Reset changes flags
+            changesNeedSaving = false;
             orderChanged = false;
-            adminToggle.classList.remove('has-changes');
             showStatusMessage('All changes saved to GitHub successfully', 'success');
         }).catch(error => {
             debug('Error saving to GitHub on exit', error);
             showStatusMessage('Error saving changes to GitHub. Your changes are saved locally.', 'error');
         });
+    }
+    
+    // Update UI for non-admin mode
+    isAdminMode = false;
+    document.body.classList.remove('admin-mode');
+    document.querySelectorAll('.tool-card').forEach(card => {
+        card.classList.remove('admin-mode');
+    });
+    document.getElementById('adminPanel').style.display = 'none';
+    
+    // Hide admin controls in the toolbar
+    document.getElementById('adminLoginLink').style.display = 'inline-block';
+    document.getElementById('adminControls').style.display = 'none';
+    
+    if (sortableInstance) {
+        sortableInstance.destroy();
+        sortableInstance = null;
     }
 }
 
@@ -919,13 +928,10 @@ function tryInferGitHubSettings() {
 function setupEventListeners() {
     debug('Setting up event listeners');
     
-    // Admin mode toggle
-    document.getElementById('adminToggle').addEventListener('click', function() {
-        if (isAdminMode) {
-            exitAdminMode();
-        } else {
-            document.getElementById('adminLoginPanel').style.display = 'block';
-        }
+    // Admin login link
+    document.getElementById('adminLoginLink').addEventListener('click', function(e) {
+        e.preventDefault();
+        document.getElementById('adminLoginPanel').style.display = 'block';
     });
     
     // Debug panel toggle
@@ -969,9 +975,36 @@ function setupEventListeners() {
         }
     });
     
+    // Logout button
+    document.getElementById('logoutBtn').addEventListener('click', function() {
+        exitAdminMode();
+    });
+    
     // New tool button
     document.getElementById('newToolBtn').addEventListener('click', function() {
         openEditPanel(null);
+    });
+    
+    // Save all changes button
+    document.getElementById('saveAllChangesBtn').addEventListener('click', async function() {
+        if (changesNeedSaving || orderChanged) {
+            // Show saving status
+            const button = document.getElementById('saveAllChangesBtn');
+            button.disabled = true;
+            button.classList.add('saving');
+            button.innerHTML = '<span class="loading-spinner"></span>Saving...';
+            
+            await saveConfigToGitHub();
+            
+            // Reset button
+            setTimeout(() => {
+                button.disabled = false;
+                button.classList.remove('saving');
+                button.innerHTML = '<span class="material-icons">save</span>Save All Changes';
+            }, 1000);
+        } else {
+            showStatusMessage('No changes to save', 'success');
+        }
     });
     
     // Close admin panel
@@ -1038,15 +1071,8 @@ function setupEventListeners() {
             debug('localStorage not available for saving tools', e);
         }
         
-        // Show a save indicator in the admin toggle
-        if (changesNeedSaving) {
-            const adminToggle = document.getElementById('adminToggle');
-            if (!adminToggle.classList.contains('has-changes')) {
-                adminToggle.classList.add('has-changes');
-                adminToggle.setAttribute('data-original-text', adminToggle.textContent);
-                adminToggle.textContent = '✓*'; // Asterisk indicates unsaved changes
-            }
-        }
+        // Update the Save Changes button
+        updateSaveChangesButton();
         
         document.getElementById('adminPanel').style.display = 'none';
     });
@@ -1067,54 +1093,11 @@ function setupEventListeners() {
                 debug('localStorage not available for saving after delete', e);
             }
             
-            // Show a save indicator in the admin toggle
-            const adminToggle = document.getElementById('adminToggle');
-            if (!adminToggle.classList.contains('has-changes')) {
-                adminToggle.classList.add('has-changes');
-                adminToggle.setAttribute('data-original-text', adminToggle.textContent);
-                adminToggle.textContent = '✓*'; // Asterisk indicates unsaved changes
-            }
+            // Update the Save Changes button
+            updateSaveChangesButton();
             
             document.getElementById('adminPanel').style.display = 'none';
         }
-    });
-    
-    // Save order button - instead of saving to GitHub immediately, just flag that there are changes
-    document.getElementById('saveOrderBtn').addEventListener('click', function() {
-        debug('Order saved locally');
-        const button = document.getElementById('saveOrderBtn');
-        button.classList.add('saving');
-        button.innerHTML = '<span class="loading-spinner"></span>Saving...';
-        
-        // Just save to localStorage and mark changes as needed
-        changesNeedSaving = true;
-        
-        try {
-            localStorage.setItem('dashboardTools', JSON.stringify(toolsData));
-            debug('Saved tool order to localStorage');
-        } catch (e) {
-            debug('localStorage not available for saving order', e);
-        }
-        
-        // Show a save indicator in the admin toggle
-        const adminToggle = document.getElementById('adminToggle');
-        if (!adminToggle.classList.contains('has-changes')) {
-            adminToggle.classList.add('has-changes');
-            adminToggle.setAttribute('data-original-text', adminToggle.textContent);
-            adminToggle.textContent = '✓*'; // Asterisk indicates unsaved changes
-        }
-        
-        // Update button to show saved locally
-        setTimeout(() => {
-            button.classList.remove('saving');
-            button.innerHTML = '<span class="material-icons">check</span>Order Saved';
-            
-            // Reset button after a delay
-            setTimeout(() => {
-                button.innerHTML = '<span class="material-icons">save</span>Save Order';
-                button.classList.remove('show');
-            }, 2000);
-        }, 800);
     });
     
     // Test GitHub connection
