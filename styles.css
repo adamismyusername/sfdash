@@ -312,6 +312,22 @@ html, body {
     transform: scale(1.1);
 }
 
+.admin-toggle.has-changes {
+    position: relative;
+}
+
+.admin-toggle.has-changes::after {
+    content: '';
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    width: 12px;
+    height: 12px;
+    background-color: var(--alizarin);
+    border-radius: 50%;
+    border: 2px solid white;
+}
+
 .admin-login-panel {
     position: fixed;
     top: 50%;
