@@ -6,7 +6,7 @@
       "title": "Salesforce",
       "description": "Goldco's main CRM for leads, campaigns, and sales",
       "url": "https://goldco.my.salesforce.com/home/home.jsp",
-      "color": "var(--nephritis)"
+      "color": "var(--clouds)"
     },
     {
       "id": 22,
