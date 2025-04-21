@@ -4,7 +4,7 @@
       "id": 5,
       "icon": "salesforce",
       "title": "Salesforce",
-      "description": "Goldco's main CRM for leads, campaigns, and sales",
+      "description": "",
       "url": "https://goldco.my.salesforce.com/home/home.jsp",
       "color": "var(--peter-river)"
     },
@@ -12,7 +12,7 @@
       "id": 22,
       "icon": "monday",
       "title": "Monday.com",
-      "description": "Project Manager for Goldco",
+      "description": "",
       "url": "https://goldco-force.monday.com/",
       "color": "var(--wisteria)"
     },
@@ -20,23 +20,23 @@
       "id": 8,
       "icon": "unbounce",
       "title": "Unbounce",
-      "description": "This is where most of Goldco's landing pages are hosted",
+      "description": "",
       "url": "https://app.unbounce.com/5598866/pages",
       "color": "var(--belize-hole)"
     },
     {
       "id": 26,
-      "icon": "dashboard",
+      "icon": "google-sheets",
       "title": "Google | Sheets",
       "description": "",
       "url": "https://docs.google.com/spreadsheets/u/0/?tgif=c",
-      "color": "var(--nephritis)"
+      "color": "var(--turquoise)"
     },
     {
       "id": 33,
       "icon": "salesforce",
       "title": "Salesforce MC",
-      "description": "Salesforce Marketing Cloud (SFMC) main marketing platform",
+      "description": "",
       "url": "https://mck3qzddmyzrqj4h3nxgbgq76y90.login.exacttarget.com/hub-cas/login",
       "color": "var(--peter-river)"
     },
@@ -44,7 +44,7 @@
       "id": 24,
       "icon": "dashboard",
       "title": "BeeFree Pro",
-      "description": "Drag and drop editor for email design, layout, and coding",
+      "description": "",
       "url": "https://beefree.io/app/590652/572321/projects",
       "color": "var(--amethyst)"
     },
@@ -52,15 +52,15 @@
       "id": 14,
       "icon": "google-drive",
       "title": "Google Drive",
-      "description": "Quick link to Google Drive",
+      "description": "",
       "url": "https://drive.google.com/drive/home",
       "color": "var(--wisteria)"
     },
     {
       "id": 16,
-      "icon": "dashboard",
+      "icon": "creatopy",
       "title": "Creatopy",
-      "description": "An app that can quickly create multiple sizes, layouts and versions of banner ads",
+      "description": "",
       "url": "https://auth.creatopy.com/auth/realms/creatopy/protocol/openid-connect/auth",
       "color": "var(--belize-hole)"
     },
@@ -68,7 +68,7 @@
       "id": 15,
       "icon": "dashboard",
       "title": "Temporary Phone #'s",
-      "description": "Get a temporary phone number for testing landing pages and text messages",
+      "description": "",
       "url": "https://temp-number.com/countries/United-States",
       "color": "var(--midnight-blue)"
     },
@@ -76,7 +76,7 @@
       "id": 2,
       "icon": "dashboard",
       "title": "Creative Generator (v1)",
-      "description": "Automatically generate creatives with proper tracking links",
+      "description": "",
       "url": "https://generator.goldcocreatives.com/generate",
       "color": "var(--turquoise)"
     },
@@ -84,7 +84,7 @@
       "id": 1,
       "icon": "dashboard",
       "title": "Creative Generator (4 in 1)",
-      "description": "Updates all links in the the 4 in 1 creative with values entered into the form fields. ",
+      "description": "",
       "url": "https://adamismyusername.github.io/4in1/",
       "color": "var(--turquoise)"
     },
@@ -92,7 +92,7 @@
       "id": 21,
       "icon": "poop",
       "title": "Competitors",
-      "description": "A list of competitors, their websites, landing pages and more. *Access requires management approval.",
+      "description": "",
       "url": "https://docs.google.com/spreadsheets/d/1if2q4XmGK-f0e1qPWlyOa1vBty-f0s3fCCrqTQhpacg/edit?gid=0#gid=0",
       "color": "var(--silver)"
     },
@@ -103,6 +103,14 @@
       "description": "",
       "url": "https://docs.google.com/spreadsheets/d/1fpGm_ZezuaGa2iI9PCkc_Y1WLpNl7XCjSA8Z4H0TGcU/edit?gid=0#gid=0",
       "color": "var(--nephritis)"
+    },
+    {
+      "id": 35,
+      "icon": "google-docs",
+      "title": "Google Docs",
+      "description": "",
+      "url": "https://docs.google.com/document/u/0/?tgif=c",
+      "color": "var(--turquoise)"
     }
   ]
 }
