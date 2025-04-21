@@ -2,7 +2,7 @@
   "toolsData": [
     {
       "id": 5,
-      "icon": "attach_money",
+      "icon": "salesforce",
       "title": "Salesforce",
       "description": "Goldco's main CRM for leads, campaigns, and sales",
       "url": "https://goldco.my.salesforce.com/home/home.jsp",
@@ -10,7 +10,7 @@
     },
     {
       "id": 22,
-      "icon": "view_timeline",
+      "icon": "monday",
       "title": "Monday.com",
       "description": "Project Manager for Goldco",
       "url": "https://goldco-force.monday.com/",
@@ -18,7 +18,7 @@
     },
     {
       "id": 8,
-      "icon": "bar_chart",
+      "icon": "unbounce",
       "title": "Unbounce",
       "description": "This is where most of Goldco's landing pages are hosted",
       "url": "https://app.unbounce.com/5598866/pages",
@@ -34,7 +34,7 @@
     },
     {
       "id": 33,
-      "icon": "campaign",
+      "icon": "salesforce",
       "title": "Salesforce MC",
       "description": "Salesforce Marketing Cloud (SFMC) main marketing platform",
       "url": "https://mck3qzddmyzrqj4h3nxgbgq76y90.login.exacttarget.com/hub-cas/login",
@@ -50,7 +50,7 @@
     },
     {
       "id": 14,
-      "icon": "add_to_drive",
+      "icon": "google-drive",
       "title": "Google Drive",
       "description": "Quick link to Google Drive",
       "url": "https://drive.google.com/drive/home",
