@@ -98,7 +98,7 @@
     },
     {
       "id": 34,
-      "icon": "dashboard",
+      "icon": "google-sheets",
       "title": "Rainmaker Bookings",
       "description": "",
       "url": "https://docs.google.com/spreadsheets/d/1fpGm_ZezuaGa2iI9PCkc_Y1WLpNl7XCjSA8Z4H0TGcU/edit?gid=0#gid=0",
@@ -110,6 +110,14 @@
       "title": "Google Docs",
       "description": "",
       "url": "https://docs.google.com/document/u/0/?tgif=c",
+      "color": "var(--turquoise)"
+    },
+    {
+      "id": 36,
+      "icon": "google-sheets",
+      "title": "Creative Cheat Sheet",
+      "description": "",
+      "url": "https://docs.google.com/spreadsheets/d/1UTGdgonpAwiHKYQ5B9N3zj25DXrRpk4I7zcHmlPuXtk/edit?gid=895709536#gid=895709536",
       "color": "var(--turquoise)"
     }
   ]
