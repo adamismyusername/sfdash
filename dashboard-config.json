@@ -6,7 +6,7 @@
       "title": "Salesforce",
       "description": "Goldco's main CRM for leads, campaigns, and sales",
       "url": "https://goldco.my.salesforce.com/home/home.jsp",
-      "color": "var(--clouds)"
+      "color": "var(--peter-river)"
     },
     {
       "id": 22,
@@ -38,7 +38,7 @@
       "title": "Salesforce MC",
       "description": "Salesforce Marketing Cloud (SFMC) main marketing platform",
       "url": "https://mck3qzddmyzrqj4h3nxgbgq76y90.login.exacttarget.com/hub-cas/login",
-      "color": "var(--nephritis)"
+      "color": "var(--peter-river)"
     },
     {
       "id": 24,
