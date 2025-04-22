@@ -119,6 +119,22 @@
       "description": "",
       "url": "https://docs.google.com/spreadsheets/d/1UTGdgonpAwiHKYQ5B9N3zj25DXrRpk4I7zcHmlPuXtk/edit?gid=895709536#gid=895709536",
       "color": "var(--turquoise)"
+    },
+    {
+      "id": 37,
+      "icon": "palette",
+      "title": "Color Palettes",
+      "description": "",
+      "url": "https://materialui.co/colors",
+      "color": "var(--wet-asphalt)"
+    },
+    {
+      "id": 38,
+      "icon": "tint-shade",
+      "title": "Tint / Shade Generator",
+      "description": "",
+      "url": "https://maketintsandshades.com/",
+      "color": "var(--midnight-blue)"
     }
   ]
 }
