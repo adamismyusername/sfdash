@@ -9,28 +9,28 @@
       "color": "var(--peter-river)",
       "quickLinks": [
         {
-          "title": "Test 1",
-          "url": "#"
+          "title": "",
+          "url": ""
         },
         {
-          "title": "Test 2",
-          "url": "#"
+          "title": "",
+          "url": ""
         },
         {
-          "title": "Test 3",
-          "url": "#"
+          "title": "",
+          "url": ""
         },
         {
-          "title": "Test 4",
-          "url": "#"
+          "title": "",
+          "url": ""
         },
         {
-          "title": "Test 5",
-          "url": "#"
+          "title": "",
+          "url": ""
         },
         {
-          "title": "Test 6",
-          "url": "#"
+          "title": "",
+          "url": ""
         }
       ]
     },
