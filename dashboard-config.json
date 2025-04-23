@@ -6,7 +6,33 @@
       "title": "Salesforce",
       "description": "",
       "url": "https://goldco.my.salesforce.com/home/home.jsp",
-      "color": "var(--peter-river)"
+      "color": "var(--peter-river)",
+      "quickLinks": [
+        {
+          "title": "Test 1",
+          "url": "#"
+        },
+        {
+          "title": "Test 2",
+          "url": "#"
+        },
+        {
+          "title": "Test 3",
+          "url": "#"
+        },
+        {
+          "title": "Test 4",
+          "url": "#"
+        },
+        {
+          "title": "Test 5",
+          "url": "#"
+        },
+        {
+          "title": "Test 6",
+          "url": "#"
+        }
+      ]
     },
     {
       "id": 22,
@@ -14,7 +40,33 @@
       "title": "Monday.com",
       "description": "",
       "url": "https://goldco-force.monday.com/",
-      "color": "var(--wisteria)"
+      "color": "var(--wisteria)",
+      "quickLinks": [
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        }
+      ]
     },
     {
       "id": 8,
@@ -22,7 +74,33 @@
       "title": "Unbounce",
       "description": "",
       "url": "https://app.unbounce.com/5598866/pages",
-      "color": "var(--belize-hole)"
+      "color": "var(--belize-hole)",
+      "quickLinks": [
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        }
+      ]
     },
     {
       "id": 26,
@@ -30,7 +108,33 @@
       "title": "Google | Sheets",
       "description": "",
       "url": "https://docs.google.com/spreadsheets/u/0/?tgif=c",
-      "color": "var(--turquoise)"
+      "color": "var(--turquoise)",
+      "quickLinks": [
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        }
+      ]
     },
     {
       "id": 33,
@@ -38,7 +142,33 @@
       "title": "Salesforce MC",
       "description": "",
       "url": "https://mck3qzddmyzrqj4h3nxgbgq76y90.login.exacttarget.com/hub-cas/login",
-      "color": "var(--peter-river)"
+      "color": "var(--peter-river)",
+      "quickLinks": [
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        }
+      ]
     },
     {
       "id": 24,
@@ -46,7 +176,33 @@
       "title": "BeeFree Pro",
       "description": "",
       "url": "https://beefree.io/app/590652/572321/projects",
-      "color": "var(--amethyst)"
+      "color": "var(--amethyst)",
+      "quickLinks": [
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        }
+      ]
     },
     {
       "id": 14,
@@ -54,7 +210,33 @@
       "title": "Google Drive",
       "description": "",
       "url": "https://drive.google.com/drive/home",
-      "color": "var(--wisteria)"
+      "color": "var(--wisteria)",
+      "quickLinks": [
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        }
+      ]
     },
     {
       "id": 16,
@@ -62,7 +244,33 @@
       "title": "Creatopy",
       "description": "",
       "url": "https://auth.creatopy.com/auth/realms/creatopy/protocol/openid-connect/auth",
-      "color": "var(--belize-hole)"
+      "color": "var(--belize-hole)",
+      "quickLinks": [
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        }
+      ]
     },
     {
       "id": 15,
@@ -70,7 +278,33 @@
       "title": "Temporary Phone #'s",
       "description": "",
       "url": "https://temp-number.com/countries/United-States",
-      "color": "var(--midnight-blue)"
+      "color": "var(--midnight-blue)",
+      "quickLinks": [
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        }
+      ]
     },
     {
       "id": 2,
@@ -78,7 +312,33 @@
       "title": "Creative Generator (v1)",
       "description": "",
       "url": "https://generator.goldcocreatives.com/generate",
-      "color": "var(--turquoise)"
+      "color": "var(--turquoise)",
+      "quickLinks": [
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        }
+      ]
     },
     {
       "id": 1,
@@ -86,7 +346,33 @@
       "title": "Creative Generator (4 in 1)",
       "description": "",
       "url": "https://adamismyusername.github.io/4in1/",
-      "color": "var(--turquoise)"
+      "color": "var(--turquoise)",
+      "quickLinks": [
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        }
+      ]
     },
     {
       "id": 21,
@@ -94,7 +380,33 @@
       "title": "Competitors",
       "description": "",
       "url": "https://docs.google.com/spreadsheets/d/1if2q4XmGK-f0e1qPWlyOa1vBty-f0s3fCCrqTQhpacg/edit?gid=0#gid=0",
-      "color": "var(--wet-asphalt)"
+      "color": "var(--wet-asphalt)",
+      "quickLinks": [
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        }
+      ]
     },
     {
       "id": 34,
@@ -102,7 +414,33 @@
       "title": "Rainmaker Bookings",
       "description": "",
       "url": "https://docs.google.com/spreadsheets/d/1fpGm_ZezuaGa2iI9PCkc_Y1WLpNl7XCjSA8Z4H0TGcU/edit?gid=0#gid=0",
-      "color": "var(--nephritis)"
+      "color": "var(--nephritis)",
+      "quickLinks": [
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        }
+      ]
     },
     {
       "id": 35,
@@ -110,7 +448,33 @@
       "title": "Google Docs",
       "description": "",
       "url": "https://docs.google.com/document/u/0/?tgif=c",
-      "color": "var(--turquoise)"
+      "color": "var(--turquoise)",
+      "quickLinks": [
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        }
+      ]
     },
     {
       "id": 36,
@@ -118,7 +482,33 @@
       "title": "Creative Cheat Sheet",
       "description": "",
       "url": "https://docs.google.com/spreadsheets/d/1UTGdgonpAwiHKYQ5B9N3zj25DXrRpk4I7zcHmlPuXtk/edit?gid=895709536#gid=895709536",
-      "color": "var(--turquoise)"
+      "color": "var(--turquoise)",
+      "quickLinks": [
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        }
+      ]
     },
     {
       "id": 37,
@@ -126,7 +516,33 @@
       "title": "Color Palettes",
       "description": "",
       "url": "https://materialui.co/colors",
-      "color": "var(--wet-asphalt)"
+      "color": "var(--wet-asphalt)",
+      "quickLinks": [
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        }
+      ]
     },
     {
       "id": 38,
@@ -134,7 +550,33 @@
       "title": "Tint / Shade Generator",
       "description": "",
       "url": "https://maketintsandshades.com/",
-      "color": "var(--midnight-blue)"
+      "color": "var(--midnight-blue)",
+      "quickLinks": [
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        },
+        {
+          "title": "",
+          "url": ""
+        }
+      ]
     }
   ]
 }
