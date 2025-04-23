@@ -111,12 +111,12 @@
       "color": "var(--turquoise)",
       "quickLinks": [
         {
-          "title": "Rainmaker Bookings",
-          "url": "https://docs.google.com/spreadsheets/d/1fpGm_ZezuaGa2iI9PCkc_Y1WLpNl7XCjSA8Z4H0TGcU/edit#gid=0"
+          "title": "Goldco Creative Cheat Sheet",
+          "url": "https://docs.google.com/spreadsheets/d/1UTGdgonpAwiHKYQ5B9N3zj25DXrRpk4I7zcHmlPuXtk/edit?gid=895709536#gid=895709536"
         },
         {
-          "title": "",
-          "url": ""
+          "title": "Rainmaker Bookings",
+          "url": "https://docs.google.com/spreadsheets/d/1fpGm_ZezuaGa2iI9PCkc_Y1WLpNl7XCjSA8Z4H0TGcU/edit#gid=0"
         },
         {
           "title": "",
@@ -381,40 +381,6 @@
       "description": "",
       "url": "https://docs.google.com/spreadsheets/d/1if2q4XmGK-f0e1qPWlyOa1vBty-f0s3fCCrqTQhpacg/edit?gid=0#gid=0",
       "color": "var(--wet-asphalt)",
-      "quickLinks": [
-        {
-          "title": "",
-          "url": ""
-        },
-        {
-          "title": "",
-          "url": ""
-        },
-        {
-          "title": "",
-          "url": ""
-        },
-        {
-          "title": "",
-          "url": ""
-        },
-        {
-          "title": "",
-          "url": ""
-        },
-        {
-          "title": "",
-          "url": ""
-        }
-      ]
-    },
-    {
-      "id": 34,
-      "icon": "google-sheets",
-      "title": "Rainmaker Bookings",
-      "description": "",
-      "url": "https://docs.google.com/spreadsheets/d/1fpGm_ZezuaGa2iI9PCkc_Y1WLpNl7XCjSA8Z4H0TGcU/edit?gid=0#gid=0",
-      "color": "var(--nephritis)",
       "quickLinks": [
         {
           "title": "",
