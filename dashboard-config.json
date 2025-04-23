@@ -445,26 +445,26 @@
     {
       "id": 37,
       "icon": "palette",
-      "title": "Color Palettes",
+      "title": "Colors & Shades",
       "description": "",
-      "url": "https://materialui.co/colors",
+      "url": "#",
       "color": "var(--wet-asphalt)",
       "quickLinks": [
         {
-          "title": "",
-          "url": ""
+          "title": "Material Colors",
+          "url": "https://materialui.co/colors"
         },
         {
-          "title": "",
-          "url": ""
+          "title": "Flat UI Colors",
+          "url": "https://materialui.co/flatuicolors"
         },
         {
-          "title": "",
-          "url": ""
+          "title": "Tailwind Colors",
+          "url": "https://tailwindcolor.com/"
         },
         {
-          "title": "",
-          "url": ""
+          "title": "Tint & Shades",
+          "url": "https://maketintsandshades.com/"
         },
         {
           "title": "",
